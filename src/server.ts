@@ -2,8 +2,10 @@ import Fastify, { FastifyInstance } from "fastify";
 import config from "./config";
 import corsPlugin from "./plugins/cors";
 import diPlugin from "./plugins/awilix";
+import cookiePlugin from "./plugins/cookie";
 import { DataSource } from "typeorm";
 import { initORM } from "./infrastructure";
+import { AuthRoutes } from "./modules/auth/auth.route";
 // import ioPlugin from "./plugins/socket";
 
 interface FastifyOptions {
@@ -13,7 +15,7 @@ interface FastifyOptions {
 
 declare module "fastify" {
   interface FastifyInstance {
-    orm: typeof DataSource;
+    orm: DataSource;
   }
 }
 
@@ -48,12 +50,18 @@ class Server {
   }
 
   async registerPlugins() {
+    this.fastify.decorate("orm", this.orm);
     await this.fastify.register(corsPlugin);
     await this.fastify.register(diPlugin);
+    await this.fastify.register(cookiePlugin);
     // await this.fastify.register(ioPlugin);
   }
 
-  async registerRoutes() {}
+  async registerRoutes() {
+    await this.fastify.register(AuthRoutes, {
+      prefix: `${config.apiPrefix}/auth`,
+    });
+  }
 
   async initInfrastructure() {
     this.orm = await initORM();
@@ -62,8 +70,8 @@ class Server {
 
   async start() {
     await this.initInfrastructure();
-    await this.registerRoutes();
     await this.registerPlugins();
+    await this.registerRoutes();
     await this.startHttpServer();
   }
 }

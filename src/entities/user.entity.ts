@@ -1,5 +1,8 @@
-import { Column, Entity, TableInheritance } from "typeorm";
+import { Column, Entity, OneToMany, TableInheritance } from "typeorm";
+import type { Relation } from "typeorm";
 import { BaseEntity } from "./base.entity";
+import { UserLog } from "./user.entity.log";
+import { RefreshToken } from "./refresh-token.entity";
 
 export enum Role {
   ADMIN = "ADMIN",
@@ -23,7 +26,7 @@ export class User extends BaseEntity {
   @Column({ type: "boolean", default: false })
   verifiedEmail!: boolean;
 
-  @Column({ type: "varchar", unique: true })
+  @Column({ type: "varchar" })
   phoneNumber!: string;
 
   @Column({ type: "varchar" })
@@ -35,15 +38,37 @@ export class User extends BaseEntity {
   @Column({ type: "varchar" })
   name!: string;
 
-  @Column({ type: "varchar" })
-  surname?: string;
+  @Column({ type: "varchar", nullable: true })
+  surname?: string | null;
 
   @Column({ type: "varchar" })
   profilePicture?: string;
 
-  @Column({ type: "date" })
+  @Column({ type: "varchar", default: "" })
+  profileStatus?: string;
+
+  @Column({ type: "timestamp", nullable: true, default: null })
   lastOnline?: Date | null;
 
-  // @OneToMany(() => RefreshToken, (rt) => rt.user)
-  // refreshTokens = new Collection<RefreshToken>(this);
+  @Column({
+    type: "decimal",
+    precision: 3,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => parseFloat(value),
+    },
+  })
+  averageRating?: number;
+
+  @OneToMany(() => UserLog, (userLog) => userLog.userId, {
+    onDelete: "CASCADE",
+  })
+  logs?: Relation<UserLog[]>;
+
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.userId, {
+    onDelete: "CASCADE",
+  })
+  refreshToken?: Relation<RefreshToken[]>;
 }

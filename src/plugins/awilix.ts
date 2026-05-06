@@ -3,6 +3,8 @@ import { FastifyInstance, FastifyPluginAsync } from "fastify";
 import { diContainer, fastifyAwilixPlugin } from "@fastify/awilix";
 import { asFunction, asValue, InjectionMode } from "awilix";
 import config from "../config";
+import { AuthContainer } from "../modules/auth/auth.container";
+import { UserContainer } from "../modules/user/user.container";
 
 const awilixPlugin: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   await fastify.register(fastifyAwilixPlugin, {
@@ -15,6 +17,8 @@ const awilixPlugin: FastifyPluginAsync = async (fastify: FastifyInstance) => {
     orm: asValue(fastify.orm),
     em: asFunction(({ orm }) => orm.manager).scoped(),
     config: asValue(config),
+    ...AuthContainer,
+    ...UserContainer,
   });
   // fastify.addHook("onRequest", (req: FastifyRequest, res: FastifyReply) => {});
 };
