@@ -6,6 +6,7 @@ import cookiePlugin from "./plugins/cookie";
 import { DataSource } from "typeorm";
 import { initORM } from "./infrastructure";
 import { AuthRoutes } from "./modules/auth/auth.route";
+import { userRoutes } from "./modules/user/user.route";
 // import ioPlugin from "./plugins/socket";
 
 interface FastifyOptions {
@@ -60,6 +61,10 @@ class Server {
   async registerRoutes() {
     await this.fastify.register(AuthRoutes, {
       prefix: `${config.apiPrefix}/auth`,
+    });
+
+    await this.fastify.register(userRoutes, {
+      prefix: `${config.apiPrefix}/users`,
     });
   }
 

@@ -1,8 +1,10 @@
 import { EntityManager } from "typeorm";
 import { Role, User } from "../../entities/user.entity";
-import { CreateUserData } from "./user.types";
+import { CreateUserData, UpdateUserData } from "./user.types";
 import { Client } from "../../entities/user.entity.client";
 import { Developer } from "../../entities/user.entity.developer";
+import { Partial } from "@sinclair/typebox";
+import { RequestError } from "../../errors/errors";
 
 export class UserRepository {
   constructor(private em: EntityManager) {}
@@ -45,6 +47,64 @@ export class UserRepository {
     const developerEntry = manager.create(Developer, pendingDeveloper);
 
     return await manager.save(developerEntry);
+  }
+
+  async update(
+    id: string,
+    data: UpdateUserData,
+    em?: EntityManager,
+  ): Promise<User | null> {
+    const manager = em ?? this.em;
+    const user = await this.findById(id, manager);
+    if (!user) return null;
+
+    const CLIENT_FIELDS = [
+      "companyName",
+      "companyLink",
+      "totalExpense",
+    ] as const;
+    const DEVELOPER_FIELDS = [
+      "socialLinkedIn",
+      "socialX",
+      "socialGitHub",
+      "portfolioLinks",
+      "bio",
+      "avgHourlyRate",
+    ] as const;
+    const COMMON_FIELDS = [
+      "login",
+      "email",
+      "phoneNumber",
+      "displayedName",
+      "name",
+      "surname",
+      "profileStatus",
+    ] as const;
+
+    let allowedFields: readonly string[] = [...COMMON_FIELDS];
+
+    switch (data.role) {
+      case Role.CLIENT:
+        allowedFields = [...allowedFields, ...CLIENT_FIELDS];
+        break;
+      case Role.DEVELOPER:
+        allowedFields = [...allowedFields, ...DEVELOPER_FIELDS];
+        break;
+      default:
+        throw new RequestError("Bad Role");
+    }
+
+    const sanitizedData: Partial<User> = {};
+    for (const key of allowedFields) {
+      const field = key as keyof UpdateUserData;
+      if (data[field] !== undefined) {
+        (sanitizedData as any)[field] = data[field];
+      }
+    }
+
+    Object.assign(user, sanitizedData);
+
+    return await this.em.save(user);
   }
 
   async findById(id: string, em?: EntityManager): Promise<User | null> {

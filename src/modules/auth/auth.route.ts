@@ -41,13 +41,19 @@ export async function AuthRoutes(fastify: FastifyInstance): Promise<void> {
 
   fastify.post<{
     Body: { refreshToken: string };
-  }>("/refresh", { schema: refreshSchema }, async (req, reply) => {
-    return resolve(req).refresh(req, reply);
-  });
+  }>(
+    "/refresh",
+    { schema: refreshSchema },
+    async (req, reply): Promise<LoginTokens> => {
+      return resolve(req).refresh(req, reply);
+    },
+  );
 
-  fastify.post<{
-    Body: { refreshToken: string };
-  }>("/logout", { schema: logoutSchema }, async (req, reply) => {
-    return resolve(req).logout(req, reply);
-  });
+  fastify.post<{}>(
+    "/logout",
+    { schema: logoutSchema },
+    async (req, reply): Promise<never> => {
+      return resolve(req).logout(req, reply);
+    },
+  );
 }
