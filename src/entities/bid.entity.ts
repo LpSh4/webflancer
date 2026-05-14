@@ -1,8 +1,9 @@
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import type { Relation } from "typeorm";
 import { BaseEntity } from "./base.entity";
 import { Commission } from "./commission.entity";
 import { Developer } from "./user.entity.developer";
+import { BidLog } from "./log.bid.entity";
 
 export enum BidStatus {
   CREATED = "created",
@@ -29,4 +30,7 @@ export class Bid extends BaseEntity {
   @ManyToOne(() => Developer, (developer) => developer.bids)
   @JoinColumn({ name: "developer_id" })
   developer!: Relation<Developer>;
+
+  @OneToMany(() => BidLog, (log) => log.bid, { onDelete: "CASCADE" })
+  logs?: Relation<BidLog[]>;
 }
