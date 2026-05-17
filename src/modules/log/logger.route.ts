@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
 import { UserLog } from "../../entities/log.user.entity";
-import { getByIdSchema } from "./schema/logger.schema";
+import { getByIdSchema } from "./schemas/logger.schema";
 // import { authenticate } from "../auth/auth.middleware";
 
 export async function loggerRoutes(fastify: FastifyInstance) {

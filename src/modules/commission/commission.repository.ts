@@ -1,9 +1,6 @@
 import { EntityManager } from "typeorm";
-import {
-  Commission,
-  CommissionProgress,
-  CommissionType,
-} from "../../entities/commission.entity";
+import { Commission, CommissionType } from "../../entities/commission.entity";
+import { CommissionProgress } from "../../entities/commission.enums";
 import { UserRepository } from "../user/user.repository";
 import {
   NotFoundError,
@@ -122,6 +119,25 @@ export class CommissionRepository {
       default:
         throw new RequestError("This user cant have commissions");
     }
+  }
+
+  async checkAccessibility(
+    targetId: string,
+    em?: EntityManager,
+  ): Promise<Boolean> {
+    const manager = em ?? this.em;
+
+    const commission = await this.findById(targetId, manager);
+    return !(
+      commission.commissionProgress in
+      [
+        CommissionProgress.ARCHIVED,
+        CommissionProgress.CANCELLED,
+        CommissionProgress.DISPUTED,
+        CommissionProgress.REFUNDED,
+        CommissionProgress.COMPLETED,
+      ]
+    );
   }
 
   async findById(id: string, em?: EntityManager): Promise<Commission> {

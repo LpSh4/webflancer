@@ -8,6 +8,7 @@ import { UserContainer } from "../modules/user/user.container";
 import { LoggerContainer } from "../modules/log/logger.container";
 import { CommissionContainer } from "../modules/commission/commission.container";
 import { BidContainer } from "../modules/bid/bid.container";
+import { ProposalContainer } from "../modules/proposal/proposal.container";
 
 const awilixPlugin: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   await fastify.register(fastifyAwilixPlugin, {
@@ -25,6 +26,7 @@ const awilixPlugin: FastifyPluginAsync = async (fastify: FastifyInstance) => {
     ...LoggerContainer,
     ...CommissionContainer,
     ...BidContainer,
+    ...ProposalContainer,
   });
   // fastify.addHook("onRequest", (req: FastifyRequest, res: FastifyReply) => {});
 };

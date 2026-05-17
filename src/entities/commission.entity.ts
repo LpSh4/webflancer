@@ -5,6 +5,12 @@ import { Client } from "./user.entity.client";
 import { Developer } from "./user.entity.developer";
 import { Bid } from "./bid.entity";
 import { CommissionLog } from "./log.commission.entity";
+import { CommissionProposal } from "./commission.entity.proposals";
+import {
+  CommissionProgress,
+  CommissionWorkStatus,
+  ProposalStatus,
+} from "./commission.enums";
 
 export enum CommissionType {
   // Simple / Content Focused
@@ -39,33 +45,6 @@ export enum CommissionType {
   // Generic fallback
   CUSTOM_DEVELOPMENT = "CUSTOM_DEVELOPMENT",
   OTHER = "OTHER",
-}
-
-export enum CommissionProgress {
-  // Initial Phase
-  POSTED = "POSTED", // Visible to developers, accepting applications
-  ARCHIVED = "ARCHIVED", // Client archived the commission, not visible to developers
-
-  // Selection Phase
-  INTERVIEWING = "INTERVIEWING", // Client is chatting with potential developers
-  OFFER_PENDING = "OFFER_PENDING", // Client sent a contract, waiting for developer to accept
-
-  // Development Phase (The "Workplace")
-  CONTRACT_STARTED = "CONTRACT_STARTED", // Developer hired, work begins
-  REQUIREMENTS_GATHERING = "REQUIREMENTS_GATHERING", // Defining tech stack/details
-  DESIGN_PHASE = "DESIGN_PHASE", // Figma/UI/UX stage
-  DEVELOPMENT = "DEVELOPMENT", // Coding in progress
-  TESTING_QA = "TESTING_QA", // Developer is bug-fixing, Client is testing
-
-  // Finalization Phase
-  REVIEW_REQUIRED = "REVIEW_REQUIRED", // Developer submitted final result, waiting for Client approval
-  REVISION_REQUESTED = "REVISION_REQUESTED", // Client asked for changes before closing
-
-  // Completion/Termination
-  COMPLETED = "COMPLETED", // Project finished successfully, review left
-  CANCELLED = "CANCELLED", // Project stopped by either party
-  DISPUTED = "DISPUTED", // Conflict (Admin/Moderator intervention needed)
-  REFUNDED = "REFUNDED", // Payment returned to client
 }
 
 @Entity()
@@ -106,6 +85,13 @@ export class Commission extends BaseEntity {
   })
   commissionProgress!: CommissionProgress;
 
+  @Column({
+    type: "enum",
+    enum: CommissionWorkStatus,
+    default: CommissionWorkStatus.PENDING,
+  })
+  commissionWorkStatus!: CommissionWorkStatus;
+
   @Column({ type: "varchar", default: "Website commission" })
   title!: string;
 
@@ -137,4 +123,9 @@ export class Commission extends BaseEntity {
     onDelete: "CASCADE",
   })
   logs?: Relation<CommissionLog[]>;
+
+  @OneToMany(() => CommissionProposal, (proposal) => proposal.commission, {
+    onDelete: "CASCADE",
+  })
+  proposals?: Relation<ProposalStatus[]>;
 }

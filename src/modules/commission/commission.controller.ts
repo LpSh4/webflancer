@@ -2,11 +2,8 @@
 import { CommissionService } from "./commission.service";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { CreateCommissionData, EditCommissionData } from "./commission.types";
-import {
-  Commission,
-  CommissionProgress,
-  CommissionType,
-} from "../../entities/commission.entity";
+import { Commission, CommissionType } from "../../entities/commission.entity";
+import { CommissionProgress } from "../../entities/commission.enums";
 
 export class CommissionController {
   constructor(

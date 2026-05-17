@@ -1,11 +1,8 @@
 import { CommissionRepository } from "./commission.repository";
-import {
-  Commission,
-  CommissionProgress,
-  CommissionType,
-} from "../../entities/commission.entity";
+import { Commission, CommissionType } from "../../entities/commission.entity";
 import { EntityManager } from "typeorm";
 import { CreateCommissionData, EditCommissionData } from "./commission.types";
+import { CommissionProgress } from "../../entities/commission.enums";
 
 export class CommissionService {
   constructor(
