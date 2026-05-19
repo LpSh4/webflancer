@@ -7,6 +7,7 @@ import {
   UnauthorizedError,
 } from "../../errors/errors";
 import {
+  CommissionProgress,
   CommissionWorkStatus,
   ProposalStatus,
 } from "../../entities/commission.enums";
@@ -29,7 +30,7 @@ export class ProposalRepository {
 
     const commission = await this.commissionRepo.findById(targetId, manager);
     if (!commission) throw new NotFoundError("Commission not found");
-    if (await this.commissionRepo.checkAccessibility(targetId, manager))
+    if (!(await this.commissionRepo.checkAccessibility(targetId, manager)))
       throw new RequestError("Not accessible for proposals");
 
     const user = await this.userRepo.findById(userId);
@@ -41,7 +42,21 @@ export class ProposalRepository {
       proposedStatus: workStatus,
       commissionId: targetId,
     });
-
+    await this.commissionRepo.changeProgress(
+      targetId,
+      (
+        {
+          UI_UX_DESIGN: CommissionProgress.DEVELOPMENT,
+          DATABASE_ARCHITECTURE: CommissionProgress.DEVELOPMENT,
+          BACKEND_DEVELOPMENT: CommissionProgress.DEVELOPMENT,
+          FRONTEND_DEVELOPMENT: CommissionProgress.DEVELOPMENT,
+          DEVOPS_ESTABLISHMENT: CommissionProgress.TESTING,
+          FULLSTACK_INTEGRATION: CommissionProgress.TESTING,
+          PRODUCTION: CommissionProgress.DEVELOPMENT_COMPLETE,
+        } as unknown as Record<CommissionWorkStatus, CommissionProgress>
+      )[workStatus],
+      manager,
+    );
     return manager.save(proposal);
   }
 
@@ -52,11 +67,9 @@ export class ProposalRepository {
     em?: EntityManager,
   ): Promise<CommissionProposal> {
     const manager = em ?? this.em;
-
     const user = await this.userRepo.findById(userId);
     if (!user) throw new RequestError("User not found");
-
-    const proposal = await this.findById(targetId, undefined, manager);
+    const proposal = await this.findById(targetId, user.id, manager);
     const commission = await this.commissionRepo.findById(
       proposal.commissionId,
     );
@@ -105,10 +118,7 @@ export class ProposalRepository {
       manager,
     );
     if (!commission) throw new NotFoundError("Commission not found");
-    if (
-      userId &&
-      (userId !== commission.clientId || userId !== commission.developerId)
-    )
+    if (userId !== commission.clientId && userId !== commission.developerId)
       throw new UnauthorizedError();
 
     return proposal;
@@ -123,13 +133,19 @@ export class ProposalRepository {
 
     const commission = await this.commissionRepo.findById(targetId, manager);
     if (!commission) throw new NotFoundError("Commission not found");
-    if (
-      userId &&
-      (userId !== commission.clientId || userId !== commission.developerId)
-    )
+
+    console.log(
+      `${userId} = ${commission.clientId} = ${commission.developerId}`,
+    );
+
+    if (userId !== commission.clientId && userId !== commission.developerId)
       throw new UnauthorizedError();
+
     return manager.find(CommissionProposal, {
       where: { commissionId: targetId },
+      order: {
+        createdAt: "DESC",
+      },
     });
   }
 }

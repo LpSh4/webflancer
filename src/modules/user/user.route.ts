@@ -5,8 +5,9 @@ import {
   UpdateProfilePictureData,
   UpdateUserData,
 } from "./user.types";
-import { Role } from "../../entities/user.entity";
+import { Role, User } from "../../entities/user.entity";
 import {
+  getByIdSchema,
   updateAvatarSchema,
   updateEmailSchema,
   updateUserSchema,
@@ -48,6 +49,26 @@ export async function userRoutes(fastify: FastifyInstance) {
       req.body.id = req.user.id;
 
       return resolve(req).updateEmail(req, res);
+    },
+  );
+
+  fastify.get(
+    "/me",
+    { preHandler: [authenticate] },
+    async (req, res): Promise<User> => {
+      return resolve(req).getMe(req, res);
+    },
+  );
+
+  fastify.get<{
+    Params: {
+      id: string;
+    };
+  }>(
+    "/:id",
+    { preHandler: [authenticate], schema: getByIdSchema },
+    async (req, res): Promise<User> => {
+      return resolve(req).getUser(req, res);
     },
   );
 }

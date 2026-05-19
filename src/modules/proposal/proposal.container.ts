@@ -4,7 +4,7 @@ import { ProposalController } from "./proposal.controller";
 import { ProposalService } from "./proposal.service";
 
 export const ProposalContainer = {
-  ProposalRepo: asClass(ProposalRepository).scoped().classic(),
-  ProposalController: asClass(ProposalController).scoped().classic(),
-  ProposalService: asClass(ProposalService).scoped().classic(),
+  proposalRepo: asClass(ProposalRepository).scoped().classic(),
+  proposalController: asClass(ProposalController).scoped().classic(),
+  proposalService: asClass(ProposalService).scoped().classic(),
 };

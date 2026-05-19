@@ -30,14 +30,16 @@ export class ProposalController {
   changeStatus = async (
     req: FastifyRequest<{
       Body: {
-        id: string;
         status: ProposalStatus;
+      };
+      Params: {
+        id: string;
       };
     }>,
     res: FastifyReply,
   ): Promise<never> => {
     await this.proposalService.changeStatus(
-      req.body.id,
+      req.params.id,
       req.body.status,
       req.user.id,
     );

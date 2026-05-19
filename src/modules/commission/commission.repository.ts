@@ -1,4 +1,4 @@
-import { EntityManager } from "typeorm";
+import { EntityManager, UpdateResult } from "typeorm";
 import { Commission, CommissionType } from "../../entities/commission.entity";
 import { CommissionProgress } from "../../entities/commission.enums";
 import { UserRepository } from "../user/user.repository";
@@ -135,6 +135,7 @@ export class CommissionRepository {
         CommissionProgress.CANCELLED,
         CommissionProgress.DISPUTED,
         CommissionProgress.REFUNDED,
+        CommissionProgress.DEVELOPMENT_COMPLETE,
         CommissionProgress.COMPLETED,
       ]
     );
@@ -148,6 +149,32 @@ export class CommissionRepository {
     if (!commission) throw new NotFoundError("Commission not found");
 
     return commission;
+  }
+
+  async changeProgress(
+    targetId: string,
+    progress: CommissionProgress,
+    em?: EntityManager,
+  ): Promise<UpdateResult> {
+    const manager = em ?? this.em;
+    const commission = await this.findById(targetId, manager);
+    if (!commission) throw new NotFoundError("Commission not found");
+    return manager.update(Commission, targetId, {
+      commissionProgress: progress,
+    });
+  }
+
+  async changeDeveloper(
+    targetId: string,
+    developerId: string | null,
+    em?: EntityManager,
+  ): Promise<UpdateResult> {
+    const manager = em ?? this.em;
+    const commission = await this.findById(targetId, manager);
+    if (!commission) throw new NotFoundError("Commission not found");
+    return manager.update(Commission, targetId, {
+      developerId: developerId,
+    });
   }
 
   async getProgresses(): Promise<CommissionProgress[]> {

@@ -21,13 +21,19 @@ export const ChangeProposalStatusSchema = {
   body: {
     type: "object",
     properties: {
-      id: { type: "string", format: "uuid" },
       status: {
         type: "string",
         enum: Object.values(ProposalStatus),
       },
     },
-    required: ["status", "id"],
+    required: ["status"],
+  },
+  params: {
+    type: "object",
+    properties: {
+      id: { type: "string", format: "uuid" },
+    },
+    required: ["id"],
   },
 };
 

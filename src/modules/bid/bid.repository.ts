@@ -10,6 +10,7 @@ import {
   UnauthorizedError,
 } from "../../errors/errors";
 import { Role } from "../../entities/user.entity";
+import { CommissionProgress } from "../../entities/commission.enums";
 
 export class BidRepository {
   constructor(
@@ -53,7 +54,7 @@ export class BidRepository {
     const bid = await this.findById(id, manager);
     if (!bid) throw new NotFoundError("Bid not found");
     if (bid.bidStatus !== BidStatus.CREATED) {
-      throw new RequestError("Bid isn't active");
+      throw new RequestError("Bid isn't selectable");
     }
 
     const commission = await this.commissionRepo.findById(
@@ -75,10 +76,16 @@ export class BidRepository {
       },
       { bidStatus: BidStatus.REJECTED },
     );
-
-    commission.developerId = bid.developerId;
-    await manager.save(commission);
-
+    await this.commissionRepo.changeDeveloper(
+      bid.commissionId,
+      bid.developerId,
+      manager,
+    );
+    await this.commissionRepo.changeProgress(
+      bid.commissionId,
+      CommissionProgress.CONTRACT_STARTED,
+      manager,
+    );
     return savedBid;
   }
 
@@ -111,6 +118,16 @@ export class BidRepository {
             bidStatus: BidStatus.REJECTED,
           },
           { bidStatus: BidStatus.CREATED },
+        );
+        await this.commissionRepo.changeDeveloper(
+          bid.commissionId,
+          null,
+          manager,
+        );
+        await this.commissionRepo.changeProgress(
+          bid.commissionId,
+          CommissionProgress.POSTED,
+          manager,
         );
         return manager.softDelete(Bid, id);
       default:
