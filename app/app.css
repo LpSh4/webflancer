@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-primary: #0f172a;
+}
+
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc;
+    color: #0f172a;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  /* Чистая минималистичная панель вместо космического стекла */
+  .glass-panel {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0; /* slate-200 */
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  /* Аккуратные активные ссылки в меню */
+  .nav-link-active {
+    background-color: #f1f5f9; /* slate-100 */
+    color: #0f172a; /* slate-900 */
+    font-weight: 600;
+  }
+}
+
+/* Строгий, тонкий скроллбар без синевы */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; } /* slate-300 */
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; } /* slate-400 */
+
+/* ── Login / Register Page ─────────────────────────────────────────────────── */
+.login-input {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.login-input:focus {
+  border-color: #0f172a;
+  box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.05);
+  outline: none;
+}
+
+/* ── Chat page ─────────────────────────────────────────────────────────────── */
+.chat-file-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.chat-file-card:hover {
+  border-color: #cbd5e1;
+  background-color: #f8fafc;
+}
+
+/* ── Team page ─────────────────────────────────────────────────────────────── */
+.team-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.employee-row {
+  transition: all 0.2s;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.employee-row:hover {
+  background-color: #f8fafc;
+}
+
+/* ── Positions page ─────────────────────────────────────────────────────────── */
+.position-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.position-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* Акцентная полоска сбоку карточки позиции */
+.color-strip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: #0f172a;
+}
+
+.card-actions {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition: all 0.2s ease;
+}
+
+.position-card:hover .card-actions {
+  opacity: 1;
+  transform: translateY(0);
+}
