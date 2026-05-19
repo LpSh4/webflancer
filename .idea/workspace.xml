@@ -2,8 +2,44 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="718a5c52-989d-4b0d-97d4-dbb42cb68aca" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/app/features/bid/ui/BidCard.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/features/bid/ui/CreateBidForm.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/features/commission/ui/CommissionCard.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/features/commission/ui/CommissionFilters.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/features/user/ui/ProfileInfoCard.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/features/user/ui/SkillsBlock.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/routes/client/dashboard.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/routes/commissions/feed.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/routes/commissions/view.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/routes/developer/dashboard.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/routes/users/profile.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/routes/users/view.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/routes/workspace/workspace.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/shared/ui/Navbar.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/user/components/UserCard.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/user/model.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/user/profile/components/LogoutButton.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/user/profile/components/intern/ActivityChart.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/user/profile/components/intern/SkillsAndMentor.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/user/profile/components/intern/StatsRow.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/user/profile/components/public/InternPublicContent.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/user/profile/components/public/StaffPublicContent.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/user/profile/components/self/InternDetailedContent.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/user/profile/components/self/StaffDetailedContent.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/user/profile/components/shared/ContactRow.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/user/profile/components/shared/ProfileHeader.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/user/profile/model.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/user/profile/repository.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/user/user.schema.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/root.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/root.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes/chat/chat.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/chat/chat.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes/layouts/app-layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/layouts/app-layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/shared/components/sidebar/Sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/shared/components/sidebar/Sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/shared/utils/auth.server.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/shared/utils/auth.server.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/config.ts" beforeDir="false" />
@@ -111,6 +147,11 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/app/features/user/shared" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -126,7 +167,7 @@
       <option name="presentableId" value="Default" />
       <updated>1779184921352</updated>
       <workItem from="1779184922315" duration="12000" />
-      <workItem from="1779185174701" duration="2147000" />
+      <workItem from="1779185174701" duration="5727000" />
     </task>
     <servers />
   </component>

@@ -1,9 +1,9 @@
 import {NavLink, useLocation, Link} from "react-router";
 import {useState, useEffect} from "react";
-import {UserCard} from "~/features/user/components/UserCard";
+import {UserCard} from "../../../features/user/shared/components/UserCard";
 import {navItems} from "~/shared/components/sidebar/NavItems";
 import {LuMenu, LuX} from "react-icons/lu";
-import type {UserProfile} from "~/features/user/model";
+import type {UserProfile} from "../../../features/user/shared/model";
 
 interface SidebarProps {
     user: UserProfile;

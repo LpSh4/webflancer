@@ -1,7 +1,7 @@
 import { commitSession, destroySession, getSession } from "~/shared/utils/session.server";
 import { redirect } from "react-router";
 import { api } from "~/shared/utils/api.server";
-import type { UserProfile } from "~/features/user/model";
+import type { UserProfile } from "../../features/user/shared/model";
 
 const activeRefreshPromises = new Map<string, Promise<any>>();
 

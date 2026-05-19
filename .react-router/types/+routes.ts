@@ -20,12 +20,44 @@ type Pages = {
   "/register": {
     params: {};
   };
+  "/commissions": {
+    params: {};
+  };
+  "/commissions/:id": {
+    params: {
+      "id": string;
+    };
+  };
+  "/profile": {
+    params: {};
+  };
+  "/users/:id": {
+    params: {
+      "id": string;
+    };
+  };
+  "/developer/dashboard": {
+    params: {};
+  };
+  "/client/dashboard": {
+    params: {};
+  };
+  "/workspace/:id": {
+    params: {
+      "id": string;
+    };
+  };
+  "/chat/:orderId": {
+    params: {
+      "orderId": string;
+    };
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/login" | "/register";
+    page: "/" | "/login" | "/register" | "/commissions" | "/commissions/:id" | "/profile" | "/users/:id" | "/developer/dashboard" | "/client/dashboard" | "/workspace/:id" | "/chat/:orderId";
   };
   "routes/home.tsx": {
     id: "routes/home";
@@ -39,6 +71,42 @@ type RouteFiles = {
     id: "routes/auth/register";
     page: "/register";
   };
+  "routes/layouts/app-layout.tsx": {
+    id: "routes/layouts/app-layout";
+    page: "/commissions" | "/commissions/:id" | "/profile" | "/users/:id" | "/developer/dashboard" | "/client/dashboard" | "/workspace/:id" | "/chat/:orderId";
+  };
+  "routes/commissions/feed.tsx": {
+    id: "routes/commissions/feed";
+    page: "/commissions";
+  };
+  "routes/commissions/view.tsx": {
+    id: "routes/commissions/view";
+    page: "/commissions/:id";
+  };
+  "routes/users/profile.tsx": {
+    id: "routes/users/profile";
+    page: "/profile";
+  };
+  "routes/users/view.tsx": {
+    id: "routes/users/view";
+    page: "/users/:id";
+  };
+  "routes/developer/dashboard.tsx": {
+    id: "routes/developer/dashboard";
+    page: "/developer/dashboard";
+  };
+  "routes/client/dashboard.tsx": {
+    id: "routes/client/dashboard";
+    page: "/client/dashboard";
+  };
+  "routes/workspace/workspace.tsx": {
+    id: "routes/workspace/workspace";
+    page: "/workspace/:id";
+  };
+  "routes/chat/chat.tsx": {
+    id: "routes/chat/chat";
+    page: "/chat/:orderId";
+  };
 };
 
 type RouteModules = {
@@ -46,4 +114,13 @@ type RouteModules = {
   "routes/home": typeof import("./app/routes/home.tsx");
   "routes/auth/login": typeof import("./app/routes/auth/login.tsx");
   "routes/auth/register": typeof import("./app/routes/auth/register.tsx");
+  "routes/layouts/app-layout": typeof import("./app/routes/layouts/app-layout.tsx");
+  "routes/commissions/feed": typeof import("./app/routes/commissions/feed.tsx");
+  "routes/commissions/view": typeof import("./app/routes/commissions/view.tsx");
+  "routes/users/profile": typeof import("./app/routes/users/profile.tsx");
+  "routes/users/view": typeof import("./app/routes/users/view.tsx");
+  "routes/developer/dashboard": typeof import("./app/routes/developer/dashboard.tsx");
+  "routes/client/dashboard": typeof import("./app/routes/client/dashboard.tsx");
+  "routes/workspace/workspace": typeof import("./app/routes/workspace/workspace.tsx");
+  "routes/chat/chat": typeof import("./app/routes/chat/chat.tsx");
 };
