@@ -14,6 +14,7 @@ export enum CommissionProgress {
   CONTRACT_STARTED = "CONTRACT_STARTED", // Developer hired, work begins
   DEVELOPMENT = "DEVELOPMENT", // Coding in progress
   TESTING = "TESTING", // Developer is bug-fixing, Client is testing
+  DEVELOPMENT_COMPLETE = "DEV_COMPLETE", // Developer completed the project and requests the approval
 
   // Completion/Termination
   COMPLETED = "COMPLETED", // Project finished successfully, review left

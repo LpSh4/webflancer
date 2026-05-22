@@ -6,11 +6,7 @@ import { Developer } from "./user.entity.developer";
 import { Bid } from "./bid.entity";
 import { CommissionLog } from "./log.commission.entity";
 import { CommissionProposal } from "./commission.entity.proposals";
-import {
-  CommissionProgress,
-  CommissionWorkStatus,
-  ProposalStatus,
-} from "./commission.enums";
+import { CommissionProgress, CommissionWorkStatus } from "./commission.enums";
 
 export enum CommissionType {
   // Simple / Content Focused
@@ -61,10 +57,11 @@ export class Commission extends BaseEntity {
   client!: Relation<Client>;
 
   @Column({ type: "varchar", name: "developer_id", nullable: true })
-  developerId?: string;
+  developerId?: string | null;
 
   @ManyToOne(() => Developer, (developer) => developer.orders, {
     onDelete: "CASCADE",
+    nullable: true,
   })
   @JoinColumn({
     name: "developer_id",
@@ -127,5 +124,5 @@ export class Commission extends BaseEntity {
   @OneToMany(() => CommissionProposal, (proposal) => proposal.commission, {
     onDelete: "CASCADE",
   })
-  proposals?: Relation<ProposalStatus[]>;
+  proposals?: Relation<CommissionProposal[]>;
 }

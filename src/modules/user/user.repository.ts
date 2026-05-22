@@ -151,6 +151,10 @@ export class UserRepository {
 
   async findByLogin(login: string, em?: EntityManager): Promise<User | null> {
     const manager = em ?? this.em;
-    return manager.findOne(User, { where: { login } });
+    return manager
+      .createQueryBuilder(User, "user")
+      .where("user.login = :login", { login })
+      .addSelect("user.password")
+      .getOne();
   }
 }

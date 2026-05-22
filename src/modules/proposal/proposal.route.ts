@@ -33,17 +33,21 @@ export async function proposalRoutes(fastify: FastifyInstance) {
 
   fastify.post<{
     Body: {
-      id: string;
       status: ProposalStatus;
     };
+    Params: {
+      id: string;
+    };
   }>(
-    "/status",
+    "/change-status/:id",
     { preHandler: authenticate, schema: ChangeProposalStatusSchema },
     async (
       req: FastifyRequest<{
         Body: {
-          id: string;
           status: ProposalStatus;
+        };
+        Params: {
+          id: string;
         };
       }>,
       res: FastifyReply,
@@ -79,7 +83,7 @@ export async function proposalRoutes(fastify: FastifyInstance) {
       targetId: string;
     };
   }>(
-    "/get-commission/:targetId",
+    "/view-commission/:targetId",
     { preHandler: authenticate, schema: getByIdSchema },
     async (
       req: FastifyRequest<{

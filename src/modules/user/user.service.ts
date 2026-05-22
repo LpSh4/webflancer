@@ -70,4 +70,10 @@ export class UserService {
     });
     return updated;
   }
+
+  async getUser(userId: string): Promise<User> {
+    const user = await this.userRepo.findById(userId);
+    if (!user) throw new NotFoundError("User not found");
+    return user;
+  }
 }

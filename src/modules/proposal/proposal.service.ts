@@ -9,7 +9,7 @@ import {
 export class ProposalService {
   constructor(
     private em: EntityManager,
-    private ProposalRepo: ProposalRepository,
+    private proposalRepo: ProposalRepository,
   ) {}
 
   async createProposal(
@@ -21,7 +21,7 @@ export class ProposalService {
     const manager = em ?? this.em;
 
     return manager.transaction(async (trxEm): Promise<CommissionProposal> => {
-      return this.ProposalRepo.createProposal(
+      return this.proposalRepo.createProposal(
         targetId,
         userId,
         workStatus,
@@ -39,7 +39,7 @@ export class ProposalService {
     const manager = em ?? this.em;
 
     return manager.transaction(async (trxEm): Promise<CommissionProposal> => {
-      return this.ProposalRepo.changeStatus(targetId, userId, status, trxEm);
+      return this.proposalRepo.changeStatus(targetId, userId, status, trxEm);
     });
   }
 
@@ -51,7 +51,7 @@ export class ProposalService {
     const manager = em ?? this.em;
 
     return manager.transaction(async (trxEm): Promise<UpdateResult> => {
-      return this.ProposalRepo.acceptAll(targetId, userId, trxEm);
+      return this.proposalRepo.acceptAll(targetId, userId, trxEm);
     });
   }
 
@@ -59,13 +59,13 @@ export class ProposalService {
     targetId: string,
     userId: string,
   ): Promise<CommissionProposal> {
-    return this.ProposalRepo.findById(targetId, userId);
+    return this.proposalRepo.findById(targetId, userId);
   }
 
   async findByCommissionId(
     targetId: string,
     userId: string,
   ): Promise<CommissionProposal[]> {
-    return this.ProposalRepo.findByCommissionId(targetId, userId);
+    return this.proposalRepo.findByCommissionId(targetId, userId);
   }
 }
