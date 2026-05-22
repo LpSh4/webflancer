@@ -1,49 +1,50 @@
 import { Form, redirect, useActionData, useNavigation, Link } from "react-router";
 import type { Route } from "./+types/login";
 import { api } from "~/shared/utils/api.server";
-import { commitSession, getSession } from "~/shared/utils/session.server";
 import { Input } from "~/shared/ui/Input";
 import { Button } from "~/shared/ui/Button";
 import { Logo } from "~/shared/ui/Logo";
 import { loginSchema } from "~/features/auth/auth.schema";
 
 export function meta(_: Route.MetaArgs) {
-    return [{ title: "Platform — Вход" }];
+    return [{ title: "Webflancer — Вход" }];
 }
 
 export async function action({ request }: Route.ActionArgs) {
     const formData = await request.formData();
     const data = Object.fromEntries(formData);
-
     const result = loginSchema.safeParse(data);
 
     if (!result.success) {
-        return {
-            fieldErrors: result.error.flatten().fieldErrors,
-            error: null,
-        };
+        return { fieldErrors: result.error.flatten().fieldErrors, error: null };
     }
 
-    const { login, password } = result.data;
-
     try {
-        const response = await api.post('/auth/login', { login, password });
-        const { accessToken, refreshToken, user } = response.data;
+        console.log(`\n🚀 [LOGIN ACTION] Отправляем POST на бэкенд...`);
+        const response = await api.post('/auth/login', result.data);
 
-        const session = await getSession(request.headers.get("Cookie"));
-        session.set("accessToken", accessToken);
-        session.set("refreshToken", refreshToken);
+        const setCookieHeaders = response.headers['set-cookie'] || response.headers.get?.('set-cookie');
+        const headers = new Headers();
 
-        const role = user.role;
-        // Редирект в зависимости от роли в новой системе
+        if (setCookieHeaders) {
+            const cookiesArray = Array.isArray(setCookieHeaders) ? setCookieHeaders : [setCookieHeaders];
+
+            cookiesArray.forEach(cookie => {
+                // РЕГУЛЯРКА: Вырезаем "; Expires=..." вместе с его запятой, оставляя только Max-Age
+                const cleanCookie = cookie.replace(/;\s*expires=[^;]+/gi, '');
+
+                console.log(`   - Отправляем в браузер чистую куку: ${cleanCookie.substring(0, 40)}...`);
+                headers.append('Set-Cookie', cleanCookie);
+            });
+        }
+
+        const role = response.data.user.role;
         const redirectUrl = role === 'CLIENT' ? '/client/dashboard' : '/developer/dashboard';
 
-        return redirect(redirectUrl, {
-            headers: {
-                "Set-Cookie": await commitSession(session),
-            },
-        });
+        return redirect(redirectUrl, { headers });
+
     } catch (error: any) {
+        console.error("🚨 Ошибка при логине:", error.message);
         return {
             error: error.response?.data?.message || "Неверный логин или пароль.",
             fieldErrors: null,
@@ -60,7 +61,7 @@ export default function LoginPage() {
                 </div>
                 <LoginCard />
                 <p className="text-center text-slate-400 text-xs mt-8 font-medium">
-                    © 2026 Freelance Platform
+                    © 2026 Webflancer Digital System
                 </p>
             </div>
         </div>

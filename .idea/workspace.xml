@@ -2,110 +2,51 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="718a5c52-989d-4b0d-97d4-dbb42cb68aca" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/features/bid/ui/BidCard.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/features/bid/ui/CreateBidForm.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/features/commission/ui/CommissionCard.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/features/commission/ui/CommissionFilters.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/features/user/ui/ProfileInfoCard.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/features/user/ui/SkillsBlock.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/client/dashboard.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/commissions/feed.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/commissions/view.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/developer/dashboard.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/users/profile.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/users/view.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/workspace/workspace.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/shared/ui/Navbar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/routes/auth/logout.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/features/user/components/UserCard.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/features/user/model.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/features/user/profile/components/LogoutButton.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/features/user/profile/components/intern/ActivityChart.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/features/user/profile/components/intern/SkillsAndMentor.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/features/user/profile/components/intern/StatsRow.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/features/user/profile/components/public/InternPublicContent.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/features/user/profile/components/public/StaffPublicContent.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/features/user/profile/components/self/InternDetailedContent.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/features/user/profile/components/self/StaffDetailedContent.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/features/user/profile/components/shared/ContactRow.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/features/user/profile/components/shared/ProfileHeader.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/features/user/profile/model.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/features/user/profile/repository.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/features/user/user.schema.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.react-router/types/+routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/.react-router/types/+routes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/auth/auth.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/features/auth/auth.schema.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/user/ui/ProfileInfoCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/features/user/ui/ProfileInfoCard.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/root.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/root.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routes/chat/chat.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/chat/chat.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes/auth/login.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/auth/login.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes/auth/register.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/auth/register.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes/client/dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/client/dashboard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes/commissions/feed.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/commissions/feed.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes/commissions/view.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/commissions/view.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes/developer/dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/developer/dashboard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes/home.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/home.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routes/layouts/app-layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/layouts/app-layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/shared/components/sidebar/Sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/shared/components/sidebar/Sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes/users/profile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/users/profile.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes/users/view.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/users/view.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/shared/components/PageHeader.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/shared/ui/Logo.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/shared/ui/Logo.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/shared/ui/Navbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/shared/ui/Navbar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/shared/utils/api.client.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/shared/utils/api.client.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/shared/utils/api.server.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/shared/utils/api.server.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/shared/utils/auth.server.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/shared/utils/auth.server.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/config.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/datasource.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/entities/base.entity.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/entities/bid.entity.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/entities/commission.entity.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/entities/log.base.entity.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/entities/log.bid.entity.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/entities/log.commission.entity.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/entities/log.user.entity.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/entities/refresh-token.entity.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/entities/user.entity.client.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/entities/user.entity.developer.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/entities/user.entity.moderator.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/entities/user.entity.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/errors/errors.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/infrastructure/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/auth/auth.container.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/auth/auth.controller.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/auth/auth.middleware.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/auth/auth.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/auth/auth.service.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/auth/auth.types.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/auth/hash.service.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/auth/jwt.service.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/auth/refresh-token.repository.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/auth/schemas/login.schema.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/auth/schemas/logout.schema.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/auth/schemas/refresh.schema.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/auth/schemas/register.schema.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/bid/bid.container.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/bid/bid.controller.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/bid/bid.repository.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/bid/bid.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/bid/bid.service.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/bid/bid.types.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/bid/schemas/bid.schema.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/commission/commission.container.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/commission/commission.controller.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/commission/commission.repository.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/commission/commission.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/commission/commission.service.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/commission/commission.types.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/commission/schemas/commission.schema.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/log/logger.container.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/log/logger.controller.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/log/logger.repository.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/log/logger.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/log/logger.service.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/log/logger.types.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/log/schema/logger.schema.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/user/schemas/user.schema.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/user/user.container.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/user/user.controller.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/user/user.repository.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/user/user.route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/user/user.service.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modules/user/user.types.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugins/awilix.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugins/cookie.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugins/cors.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plugins/socket.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/auth/register.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/server.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/types/awilix.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/shared/utils/session.server.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/_metadata.json" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/_metadata.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/chunk-3DCTBBZ3.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/chunk-3DCTBBZ3.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/chunk-FONOKHZP.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/chunk-FONOKHZP.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/chunk-GABTAQ33.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/chunk-GABTAQ33.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/lucide-react.js" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/lucide-react.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/lucide-react.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/lucide-react.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react-dom.js" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react-dom.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react-dom_client.js" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react-dom_client.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react-dom_client.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react-dom_client.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react-router.js" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react-router.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react-router_dom.js" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react-router_dom.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react-router_dom.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react-router_dom.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react.js" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react_jsx-dev-runtime.js" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react_jsx-dev-runtime.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react_jsx-dev-runtime.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react_jsx-dev-runtime.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react_jsx-runtime.js" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react_jsx-runtime.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react_jsx-runtime.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react_jsx-runtime.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/vite.config.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -131,22 +72,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "frontend-dev",
-    "javascript.preferred.runtime.type.id": "node",
-    "last_opened_file_path": "/home/whyniero/michiel/frontend",
-    "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "/opt/WebStorm-261.23567.141/plugins/javascript-plugin/jsLanguageServicesImpl/external",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;frontend-dev&quot;,
+    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/whyniero/michiel/frontend&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/home/whyniero/michiel/frontend/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/app/features/user/shared" />
@@ -168,6 +109,9 @@
       <updated>1779184921352</updated>
       <workItem from="1779184922315" duration="12000" />
       <workItem from="1779185174701" duration="5952000" />
+      <workItem from="1779309848730" duration="39000" />
+      <workItem from="1779391092308" duration="5909000" />
+      <workItem from="1779446213652" duration="8939000" />
     </task>
     <servers />
   </component>

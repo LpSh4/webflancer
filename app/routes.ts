@@ -9,6 +9,8 @@ export default [
 
     // Основная рабочая зона под защитой авторизации и с Сайдбаром
     layout("routes/layouts/app-layout.tsx", [
+        route("logout", "routes/auth/logout.tsx"),
+
         // Общие роуты для заказов
         route("commissions", "routes/commissions/feed.tsx"),        // Лента всех заказов
         route("commissions/:id", "routes/commissions/view.tsx"),    // Детали заказа + ставки (Bids)

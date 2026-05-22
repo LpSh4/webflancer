@@ -1,85 +1,74 @@
-import { commitSession, destroySession, getSession } from "~/shared/utils/session.server";
 import { redirect } from "react-router";
 import { api } from "~/shared/utils/api.server";
-import type { UserProfile } from "../../features/user/shared/model";
+import type { UserProfile } from "~/features/user/shared/model";
 
-const activeRefreshPromises = new Map<string, Promise<any>>();
+export async function getUser(request: Request): Promise<{ user: UserProfile }> {
+    const cookieHeader = request.headers.get("Cookie");
 
-export async function getUser(request: Request): Promise<{ user: UserProfile, token: string }> {
-    const session = await getSession(request.headers.get("Cookie"));
-    const accessToken = session.get("accessToken");
-    const refreshToken = session.get("refreshToken");
-
-    if (!accessToken) {
+    if (!cookieHeader || !cookieHeader.includes("access_token")) {
         throw redirect("/login", {
-            headers: { "Set-Cookie": await destroySession(session) }
+            headers: [["Set-Cookie", "access_token=; Max-Age=0; Path=/"]]
         });
     }
 
     try {
-        // Запрос профиля текущего пользователя
         const response = await api.get('/users/me', {
-            headers: { Authorization: `Bearer ${accessToken}` }
+            headers: { Cookie: cookieHeader }
         });
-        return { user: response.data, token: accessToken };
+        return { user: response.data };
+
     } catch (error: any) {
-        if (error.response?.status !== 401 || !refreshToken) {
+        if (error.response?.status !== 401 || !cookieHeader.includes("refresh_token")) {
             throw redirect("/login", {
-                headers: { "Set-Cookie": await destroySession(session) }
+                headers: [["Set-Cookie", "access_token=; Max-Age=0; Path=/"]]
             });
         }
 
+        console.log("[Auth Server] Access token expired. Initializing refresh flow.");
+
         try {
-            let refreshData;
+            const refreshResponse = await api.post('/auth/refresh', {}, {
+                headers: { Cookie: cookieHeader }
+            });
 
-            if (activeRefreshPromises.has(refreshToken)) {
-                refreshData = await activeRefreshPromises.get(refreshToken);
-            } else {
-                // Путь к рефрешу токенов на бэкенде друга
-                const refreshPromise = api.post('/auth/refresh', { refreshToken }).then(res => res.data);
-                activeRefreshPromises.set(refreshToken, refreshPromise);
+            const setCookieHeaders = refreshResponse.headers['set-cookie'];
+            const headers = new Headers();
 
-                try {
-                    refreshData = await refreshPromise;
-                } finally {
-                    setTimeout(() => activeRefreshPromises.delete(refreshToken), 2000);
-                }
+            if (setCookieHeaders) {
+                const cookiesArray = Array.isArray(setCookieHeaders) ? setCookieHeaders : [setCookieHeaders];
+
+                cookiesArray.forEach(cookie => {
+                    const cleanCookie = cookie.replace(/;\s*expires=[^;]+/gi, '');
+                    headers.append('Set-Cookie', cleanCookie);
+                });
             }
 
-            const { accessToken: newAccess, refreshToken: newRefresh } = refreshData;
+            console.log("[Auth Server] Refresh successful. Redirecting to requested URL.");
+            throw redirect(request.url, { headers });
 
-            session.set("accessToken", newAccess);
-            session.set("refreshToken", newRefresh);
-
-            throw redirect(request.url, {
-                headers: { 'Set-Cookie': await commitSession(session) }
-            });
         } catch (refreshError: any) {
             if (refreshError instanceof Response) throw refreshError;
 
-            throw redirect("/login", {
-                headers: { 'Set-Cookie': await destroySession(session) }
-            });
+            console.error("[Auth Server] Refresh failed. Session expired or invalid token.");
+
+            const headers = new Headers();
+            headers.append("Set-Cookie", "access_token=; Max-Age=0; Path=/");
+            headers.append("Set-Cookie", "refresh_token=; Max-Age=0; Path=/");
+
+            throw redirect("/login", { headers });
         }
     }
 }
 
 export async function requireAuth(request: Request) {
-    const { user, token } = await getUser(request);
-
-    return {
-        user,
-        token,
-        headers: { Authorization: `Bearer ${token}` }
-    };
+    const { user } = await getUser(request);
+    return { user };
 }
 
 export async function requireRole(request: Request, allowedRoles: ("CLIENT" | "DEVELOPER")[]) {
     const auth = await requireAuth(request);
-
     if (!allowedRoles.includes(auth.user.role as any)) {
         throw new Response('Forbidden', { status: 403 });
     }
-
     return auth;
 }

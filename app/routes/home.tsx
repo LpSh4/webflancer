@@ -1,42 +1,40 @@
-import { redirect, Link } from "react-router";
+import { redirect, useLoaderData } from "react-router";
 import type { Route } from "./+types/home";
 import { getUser } from "~/shared/utils/auth.server";
-import { Logo } from "~/shared/ui/Logo";
+import {Navbar} from "~/shared/ui/Navbar";
+
 
 export async function loader({ request }: Route.LoaderArgs) {
     try {
         const { user } = await getUser(request);
 
-        // Распределяем потоки пользователей по их ролям
-        if (user.role === 'CLIENT') {
-            return redirect('/client/dashboard');
-        }
-        if (user.role === 'DEVELOPER') {
-            return redirect('/developer/dashboard');
+        // Просто отдаем юзера. Теперь авторизованный пользователь
+        // сможет находиться на главной странице, а навбар покажет его профиль.
+        return { user };
+    } catch (error) {
+        // ВАЖНО: Разбираемся, что именно выкинул getUser
+        if (error instanceof Response) {
+            // Если getUser кидает на /login (нет кук или юзер реально не авторизован) —
+            // мы глушим этот редирект, чтобы гость мог смотреть лендинг
+            if (error.headers.get("Location") === "/login") {
+                return { user: null };
+            }
+            // А вот если это рефреш токенов (редирект на текущую страницу с новыми куками) —
+            // обязательно прокидываем его дальше!
+            throw error;
         }
 
-        return redirect('/profile');
-    } catch (error) {
-        // Если токенов нет, просто остаемся на этой странице и показываем лендинг
-        return null;
+        // Фоллбэк для любых других серверных ошибок
+        return { user: null };
     }
 }
-
 export default function Home() {
+    const { user } = useLoaderData<typeof loader>() || { user: null };
+
     return (
         <div className="flex flex-col min-h-screen bg-white">
-            {/* Навигационная панель */}
-            <header className="border-b border-slate-100 px-6 py-4 flex items-center justify-between max-w-7xl w-full mx-auto">
-                <Logo size="sm" showSubtitle={false} className="items-start" />
-                <div className="flex items-center space-x-4">
-                    <Link to="/login" className="text-sm font-medium text-slate-600 hover:text-slate-900 px-3 py-1.5 transition-colors">
-                        Войти
-                    </Link>
-                    <Link to="/register" className="text-sm font-medium bg-slate-900 text-white rounded-lg px-4 py-1.5 hover:bg-slate-800 transition-colors">
-                        Регистрация
-                    </Link>
-                </div>
-            </header>
+            {/* Наш единый умный навбар (сейчас отрендерит гостевой режим) */}
+            <Navbar user={user} />
 
             {/* Главный контент */}
             <main className="flex-1 flex flex-col justify-center max-w-4xl mx-auto px-6 py-20 text-center">

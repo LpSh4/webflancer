@@ -8,14 +8,14 @@ import {
     useRouteLoaderData,
     Link,
 } from "react-router";
-
-import type { Route } from "./+types/root";
+import {getUser} from "~/shared/utils/auth.server";
+import type {Route} from "./+types/root";
 import "./app.css";
-import type { UserProfile } from "./features/user/shared/model";
-import { useEffect } from "react";
+import type {UserProfile} from "./features/user/shared/model";
+import {useEffect} from "react";
 
 export const links: Route.LinksFunction = () => [
-    { rel: "preconnect", href: "https://fonts.googleapis.com" },
+    {rel: "preconnect", href: "https://fonts.googleapis.com"},
     {
         rel: "preconnect",
         href: "https://fonts.gstatic.com",
@@ -27,44 +27,39 @@ export const links: Route.LinksFunction = () => [
     },
 ];
 
-export async function loader({ request }: Route.LoaderArgs) {
-    const mockUser: UserProfile = {
-        id: "user-777",
-        role: "DEVELOPER",
-        login: "alex_developer",
-        email: "alex.dev@webflancer.ru",
-        phoneNumber: "+79991112233",
-        verifiedEmail: true,
-        displayedName: "Алексей Разработчик",
-        name: "Алексей",
-        surname: "Иванов",
-        profileStatus: "Локальный мок",
-        averageRating: 4.95,
-        lastOnline: new Date()
-    };
 
-    return {
-        user: mockUser,
-        token: "mock-crypto-token-123"
-    };
+// Пример для лоадера в root.tsx
+export async function loader({ request }: Route.LoaderArgs) {
+    try {
+        const { user } = await getUser(request);
+        return { user, token: null };
+    } catch (error) {
+        if (error instanceof Response) {
+            if (error.headers.get("Location") === "/login") {
+                return { user: null, token: null };
+            }
+            throw error;
+        }
+        return { user: null, token: null };
+    }
 }
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export function Layout({children}: { children: React.ReactNode }) {
     return (
         <html lang="ru" className="h-full bg-slate-50">
         <head>
-            <meta charSet="utf-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <Meta />
-            <Links />
+            <meta charSet="utf-8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1"/>
+            <Meta/>
+            <Links/>
             <title>Webflancer</title>
         </head>
         <body className="h-full text-slate-900 antialiased bg-slate-50">
         <div className="min-h-full flex flex-col">
             {children}
         </div>
-        <ScrollRestoration />
-        <Scripts />
+        <ScrollRestoration/>
+        <Scripts/>
         </body>
         </html>
     );
@@ -78,10 +73,10 @@ export default function App() {
         if (!user || !token) return;
     }, [user, token]);
 
-    return <Outlet />;
+    return <Outlet/>;
 }
 
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+export function ErrorBoundary({error}: Route.ErrorBoundaryProps) {
     let message = "Упс!";
     let details = "Произошла ошибка.";
     let stack: string | undefined;
@@ -99,7 +94,8 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
             <div className="max-w-md w-full">
                 <h1 className="text-5xl font-black text-slate-900 mb-2">{message}</h1>
                 <p className="text-sm text-slate-500 mb-6">{details}</p>
-                <Link to="/" className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition-colors">
+                <Link to="/"
+                      className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition-colors">
                     На главную
                 </Link>
                 {stack && (
@@ -121,6 +117,7 @@ export function useAuthToken() {
     const rootData = useRouteLoaderData('root') as { token: string | null } | undefined;
     return rootData?.token;
 }
+
 // import {
 //     isRouteErrorResponse,
 //     Links,

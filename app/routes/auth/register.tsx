@@ -7,7 +7,7 @@ import { Logo } from "~/shared/ui/Logo";
 import { registerSchema } from "~/features/auth/auth.schema";
 
 export function meta(_: Route.MetaArgs) {
-    return [{ title: "Platform — Регистрация" }];
+    return [{ title: "Webflancer — Регистрация" }];
 }
 
 export async function action({ request }: Route.ActionArgs) {
@@ -24,9 +24,28 @@ export async function action({ request }: Route.ActionArgs) {
     }
 
     try {
+        // 1. Создаем аккаунт
         await api.post('/auth/register', result.data);
-        // После успешной регистрации отправляем на логин
-        return redirect('/login');
+
+        // 2. Сразу логинимся, чтобы бэкенд сгенерировал токены (куки)
+        const loginResponse = await api.post('/auth/login', {
+            login: result.data.login,
+            password: result.data.password
+        });
+
+        // 3. Забираем куки
+        const setCookieHeaders = loginResponse.headers['set-cookie'];
+        const headers = new Headers();
+
+        if (Array.isArray(setCookieHeaders)) {
+            setCookieHeaders.forEach(cookie => headers.append('Set-Cookie', cookie));
+        }
+
+        const role = loginResponse.data.user.role;
+        const redirectUrl = role === 'CLIENT' ? '/client/dashboard' : '/developer/dashboard';
+
+        // 4. Редиректим и клеим куки в браузер
+        return redirect(redirectUrl, { headers });
     } catch (error: any) {
         return {
             error: error.response?.data?.message || "Ошибка при регистрации. Возможно, логин или email уже заняты.",
@@ -37,12 +56,15 @@ export async function action({ request }: Route.ActionArgs) {
 
 export default function RegisterPage() {
     return (
-        <div className="flex items-center justify-center min-h-screen bg-slate-50 p-4">
+        <div className="flex items-center justify-center min-h-screen bg-slate-50 p-4 py-12">
             <div className="w-full max-w-md">
                 <div className="flex justify-center mb-8">
                     <Logo size="md" className="text-slate-900" />
                 </div>
                 <RegisterCard />
+                <p className="text-center text-slate-400 text-xs mt-8 font-medium">
+                    © 2026 Webflancer Digital System
+                </p>
             </div>
         </div>
     );
@@ -56,7 +78,7 @@ function RegisterCard() {
     return (
         <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
             <h2 className="text-2xl font-semibold text-slate-900 mb-2">Создать аккаунт</h2>
-            <p className="text-slate-500 text-sm mb-6">Присоединяйтесь к платформе</p>
+            <p className="text-slate-500 text-sm mb-6">Присоединяйтесь к экосистеме фриланса</p>
 
             {actionData?.error && (
                 <div className="mb-6 p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-sm text-center">
@@ -65,62 +87,30 @@ function RegisterCard() {
             )}
 
             <Form method="post" className="space-y-4">
-                <div className="flex flex-col space-y-1">
-                    <label className="text-sm font-medium text-slate-700">Я хочу...</label>
-                    <select
-                        name="role"
-                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        defaultValue="CLIENT"
-                    >
-                        <option value="CLIENT">Создавать заказы (Клиент)</option>
-                        <option value="DEVELOPER">Искать работу (Исполнитель)</option>
-                    </select>
-                    {actionData?.fieldErrors?.role && (
-                        <p className="text-xs text-red-500">{actionData.fieldErrors.role}</p>
-                    )}
+                <div className="flex gap-4 mb-2">
+                    <label className="flex-1 cursor-pointer">
+                        <input type="radio" name="role" value="CLIENT" className="peer sr-only" defaultChecked />
+                        <div className="text-center px-4 py-2 border border-slate-200 rounded-lg peer-checked:bg-slate-900 peer-checked:text-white peer-checked:border-slate-900 transition-colors text-sm font-medium text-slate-600 hover:bg-slate-50">
+                            Я Заказчик
+                        </div>
+                    </label>
+                    <label className="flex-1 cursor-pointer">
+                        <input type="radio" name="role" value="DEVELOPER" className="peer sr-only" />
+                        <div className="text-center px-4 py-2 border border-slate-200 rounded-lg peer-checked:bg-slate-900 peer-checked:text-white peer-checked:border-slate-900 transition-colors text-sm font-medium text-slate-600 hover:bg-slate-50">
+                            Я Разработчик
+                        </div>
+                    </label>
                 </div>
+                {actionData?.fieldErrors?.role && <p className="text-red-500 text-xs mt-1">{actionData.fieldErrors.role[0]}</p>}
 
-                <Input
-                    label="Логин"
-                    name="login"
-                    required
-                    placeholder="ivan_ivanov"
-                    error={actionData?.fieldErrors?.login?.[0]}
-                />
+                <Input label="Имя и Фамилия" name="name" required placeholder="Иван Иванов" error={actionData?.fieldErrors?.name?.[0]} />
+                <Input label="Логин" name="login" required placeholder="ivan_dev" error={actionData?.fieldErrors?.login?.[0]} />
+                <Input label="Email" name="email" type="email" required placeholder="ivan@example.com" error={actionData?.fieldErrors?.email?.[0]} />
+                <Input label="Телефон" name="phoneNumber" required placeholder="89001234567" error={actionData?.fieldErrors?.phoneNumber?.[0]} />
+                <Input label="Пароль" name="password" type="password" required placeholder="••••••••" error={actionData?.fieldErrors?.password?.[0]} />
 
-                <Input
-                    label="Отображаемое имя"
-                    name="displayedName"
-                    required
-                    placeholder="Иван Иванов"
-                    error={actionData?.fieldErrors?.displayedName?.[0]}
-                />
-
-                <Input
-                    label="Email"
-                    name="email"
-                    type="email"
-                    required
-                    placeholder="ivan@example.com"
-                    error={actionData?.fieldErrors?.email?.[0]}
-                />
-
-                <Input
-                    label="Пароль"
-                    name="password"
-                    type="password"
-                    required
-                    placeholder="••••••••"
-                    error={actionData?.fieldErrors?.password?.[0]}
-                />
-
-                <Button
-                    type="submit"
-                    variant="primary"
-                    disabled={isSubmitting}
-                    className="w-full py-3 mt-4"
-                >
-                    {isSubmitting ? "Регистрация..." : "Зарегистрироваться"}
+                <Button type="submit" variant="primary" disabled={isSubmitting} className="w-full py-3 mt-6">
+                    {isSubmitting ? "Создание..." : "Зарегистрироваться"}
                 </Button>
             </Form>
 
