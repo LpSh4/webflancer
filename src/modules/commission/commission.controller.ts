@@ -4,6 +4,10 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { CreateCommissionData, EditCommissionData } from "./commission.types";
 import { Commission, CommissionType } from "../../entities/commission.entity";
 import { CommissionProgress } from "../../entities/commission.enums";
+import {
+  CommissionSearchQuery,
+  CommissionSearchResponse,
+} from "./schemas/commission.schema";
 
 export class CommissionController {
   constructor(
@@ -29,6 +33,35 @@ export class CommissionController {
     res: FastifyReply,
   ): Promise<never> => {
     await this.commissionService.editCommission(req.body);
+
+    return res.status(204).send();
+  };
+
+  searchCommissions = async (
+    req: FastifyRequest<{
+      Querystring: CommissionSearchQuery;
+    }>,
+    res: FastifyReply,
+  ): Promise<CommissionSearchResponse> => {
+    const commissions = await this.commissionService.searchCommissions(
+      req.query,
+    );
+
+    return res.status(200).send(commissions);
+  };
+
+  completeCommission = async (
+    req: FastifyRequest<{
+      Params: {
+        targetId: string;
+      };
+    }>,
+    res: FastifyReply,
+  ): Promise<never> => {
+    await this.commissionService.completeCommission(
+      req.params.targetId,
+      req.user.id,
+    );
 
     return res.status(204).send();
   };

@@ -1,4 +1,7 @@
-import { CommissionType } from "../../../entities/commission.entity";
+import {
+  Commission,
+  CommissionType,
+} from "../../../entities/commission.entity";
 
 export const CreateCommissionSchema = {
   body: {
@@ -84,3 +87,58 @@ export const getByIdSchema = {
     required: ["targetId"],
   },
 };
+
+export const CommissionSearchSchema = {
+  querystring: {
+    type: "object",
+    properties: {
+      page: {
+        type: "integer",
+        default: 1,
+        minimum: 1,
+      },
+      limit: {
+        type: "integer",
+        default: 7,
+        minimum: 1,
+        maximum: 50,
+      },
+      keywords: {
+        type: "string",
+      },
+      commissionType: {
+        type: "string",
+        enum: Object.values(CommissionType),
+      },
+      budgetFrom: {
+        type: "integer",
+        minimum: 0,
+      },
+      budgetTo: {
+        type: "integer",
+        minimum: 0,
+      },
+      sortBy: {
+        type: "string",
+        enum: ["highest_budget", "lowest_budget", "fresh", "soonest_deadline"],
+        default: "fresh",
+      },
+    },
+    additionalProperties: false,
+  },
+};
+
+export interface CommissionSearchQuery {
+  page?: number;
+  limit?: number;
+  keywords?: string;
+  commissionType?: CommissionType;
+  budgetFrom?: number;
+  budgetTo?: number;
+  sortBy?: "high_budget" | "low_budget" | "fresh" | "soonest";
+}
+
+export interface CommissionSearchResponse {
+  meta: { total: number; page: number; lastPage: number };
+  data: Commission[];
+}
