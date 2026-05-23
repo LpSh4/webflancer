@@ -2,6 +2,9 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { CreateCommissionData, EditCommissionData } from "./commission.types";
 import { authenticate } from "../auth/auth.middleware";
 import {
+  CommissionSearchQuery,
+  CommissionSearchResponse,
+  CommissionSearchSchema,
   CreateCommissionSchema,
   EditCommissionSchema,
   getByIdSchema,
@@ -42,6 +45,37 @@ export async function commissionRoutes(fastify: FastifyInstance) {
       req.body.userId = req.user.id;
       req.body.id = req.params.id;
       return resolve(req).editCommission(req, res);
+    },
+  );
+
+  fastify.get<{
+    Querystring: CommissionSearchQuery;
+  }>(
+    "/search",
+    { schema: CommissionSearchSchema },
+    async (
+      req: FastifyRequest<{
+        Querystring: CommissionSearchQuery;
+      }>,
+      res: FastifyReply,
+    ): Promise<CommissionSearchResponse> => {
+      return resolve(req).searchCommissions(req, res);
+    },
+  );
+
+  fastify.post<{
+    Params: { targetId: string };
+  }>(
+    "/complete/:targetId",
+    {
+      preHandler: [authenticate],
+      schema: getByIdSchema,
+    },
+    async (
+      req: FastifyRequest<{ Params: { targetId: string } }>,
+      res: FastifyReply,
+    ): Promise<never> => {
+      return resolve(req).completeCommission(req, res);
     },
   );
 
