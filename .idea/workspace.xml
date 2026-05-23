@@ -2,51 +2,22 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="718a5c52-989d-4b0d-97d4-dbb42cb68aca" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/routes/auth/logout.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/features/commission/commission.schema.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/features/commission/ui/CreateCommissionModal.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.react-router/types/+routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/.react-router/types/+routes.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/features/auth/auth.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/features/auth/auth.schema.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/features/user/ui/ProfileInfoCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/features/user/ui/ProfileInfoCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/root.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/root.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/commission/ui/CommissionCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/features/commission/ui/CommissionCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/commission/ui/CommissionFilters.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/features/commission/ui/CommissionFilters.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routes/auth/login.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/auth/login.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routes/auth/register.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/auth/register.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes/chat/chat.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/chat/chat.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routes/client/dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/client/dashboard.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routes/commissions/feed.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/commissions/feed.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routes/commissions/view.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/commissions/view.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routes/developer/dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/developer/dashboard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routes/home.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/home.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routes/layouts/app-layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/layouts/app-layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routes/users/profile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/users/profile.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routes/users/view.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/users/view.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/shared/components/PageHeader.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/shared/ui/Logo.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/shared/ui/Logo.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/shared/ui/Modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/shared/ui/Modal.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/shared/ui/Navbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/shared/ui/Navbar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/shared/utils/api.client.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/shared/utils/api.client.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/shared/utils/api.server.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/shared/utils/api.server.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/shared/utils/auth.server.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/shared/utils/auth.server.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/shared/utils/session.server.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/_metadata.json" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/_metadata.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/chunk-3DCTBBZ3.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/chunk-3DCTBBZ3.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/chunk-FONOKHZP.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/chunk-FONOKHZP.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/chunk-GABTAQ33.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/chunk-GABTAQ33.js.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/lucide-react.js" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/lucide-react.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/lucide-react.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/lucide-react.js.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react-dom.js" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react-dom.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react-dom_client.js" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react-dom_client.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react-dom_client.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react-dom_client.js.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react-router.js" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react-router.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react-router_dom.js" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react-router_dom.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react-router_dom.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react-router_dom.js.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react.js" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react_jsx-dev-runtime.js" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react_jsx-dev-runtime.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react_jsx-dev-runtime.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react_jsx-dev-runtime.js.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react_jsx-runtime.js" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react_jsx-runtime.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react_jsx-runtime.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react_jsx-runtime.js.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/vite.config.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,6 +28,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="TypeScript JSX File" />
+        <option value="TypeScript File" />
       </list>
     </option>
   </component>
@@ -111,7 +83,10 @@
       <workItem from="1779185174701" duration="5952000" />
       <workItem from="1779309848730" duration="39000" />
       <workItem from="1779391092308" duration="5909000" />
-      <workItem from="1779446213652" duration="8939000" />
+      <workItem from="1779446213652" duration="9265000" />
+      <workItem from="1779461090320" duration="669000" />
+      <workItem from="1779534289409" duration="4000" />
+      <workItem from="1779534304717" duration="5370000" />
     </task>
     <servers />
   </component>

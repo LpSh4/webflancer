@@ -14,9 +14,12 @@ export const registerSchema = z.object({
     email: z.string()
         .email("Неверный email")
         .max(255),
-    name: z.string() // Переименовали с displayedName
+    name: z.string()
         .min(1, "Введите имя")
         .max(100, "Имя максимум 100 символов"),
+    surname: z.string()
+        .min(1, "Введите фамилию")
+        .max(100, "Фамилия максимум 100 символов").nullable(),
     phoneNumber: z.string() // Добавили телефон
         .regex(/^89\d{9}$/, "Формат: 89XXXXXXXXX (11 цифр)"),
 });

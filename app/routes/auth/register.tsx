@@ -38,13 +38,15 @@ export async function action({ request }: Route.ActionArgs) {
         const headers = new Headers();
 
         if (Array.isArray(setCookieHeaders)) {
-            setCookieHeaders.forEach(cookie => headers.append('Set-Cookie', cookie));
+            setCookieHeaders.forEach(cookie => {
+                const cleanCookie = cookie.replace(/;\s*expires=[^;]+/gi, '');
+                headers.append('Set-Cookie', cleanCookie);
+            });
         }
 
         const role = loginResponse.data.user.role;
         const redirectUrl = role === 'CLIENT' ? '/client/dashboard' : '/developer/dashboard';
 
-        // 4. Редиректим и клеим куки в браузер
         return redirect(redirectUrl, { headers });
     } catch (error: any) {
         return {
@@ -59,10 +61,12 @@ export default function RegisterPage() {
         <div className="flex items-center justify-center min-h-screen bg-slate-50 p-4 py-12">
             <div className="w-full max-w-md">
                 <div className="flex justify-center mb-8">
-                    <Logo size="md" className="text-slate-900" />
+                    <Link to="/" className="hover:opacity-90 transition-opacity">
+                        <Logo size="md" className="text-slate-900" />
+                    </Link>
                 </div>
                 <RegisterCard />
-                <p className="text-center text-slate-400 text-xs mt-8 font-medium">
+                <p className="text-center text-slate-400 text-xs mt-8 font-medium tracking-wide">
                     © 2026 Webflancer Digital System
                 </p>
             </div>
@@ -77,46 +81,76 @@ function RegisterCard() {
 
     return (
         <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
-            <h2 className="text-2xl font-semibold text-slate-900 mb-2">Создать аккаунт</h2>
-            <p className="text-slate-500 text-sm mb-6">Присоединяйтесь к экосистеме фриланса</p>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2 tracking-tight text-center">Создать аккаунт</h2>
+            <p className="text-slate-500 text-xs mb-6 text-center">Присоединяйтесь к экосистеме фриланса</p>
 
             {actionData?.error && (
-                <div className="mb-6 p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-sm text-center">
+                <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-xs font-medium text-center">
                     {actionData.error}
                 </div>
             )}
 
             <Form method="post" className="space-y-4">
-                <div className="flex gap-4 mb-2">
-                    <label className="flex-1 cursor-pointer">
+
+                {/* Свитчер выбора роли */}
+                <div className="bg-slate-100 p-1 rounded-xl flex gap-1 mb-2">
+                    <label className="flex-1 cursor-pointer relative">
                         <input type="radio" name="role" value="CLIENT" className="peer sr-only" defaultChecked />
-                        <div className="text-center px-4 py-2 border border-slate-200 rounded-lg peer-checked:bg-slate-900 peer-checked:text-white peer-checked:border-slate-900 transition-colors text-sm font-medium text-slate-600 hover:bg-slate-50">
+                        <div className="text-center px-4 py-2 rounded-lg peer-checked:bg-white peer-checked:shadow-sm peer-checked:text-slate-900 transition-all text-xs font-bold text-slate-500 hover:text-slate-700">
                             Я Заказчик
                         </div>
                     </label>
-                    <label className="flex-1 cursor-pointer">
+                    <label className="flex-1 cursor-pointer relative">
                         <input type="radio" name="role" value="DEVELOPER" className="peer sr-only" />
-                        <div className="text-center px-4 py-2 border border-slate-200 rounded-lg peer-checked:bg-slate-900 peer-checked:text-white peer-checked:border-slate-900 transition-colors text-sm font-medium text-slate-600 hover:bg-slate-50">
+                        <div className="text-center px-4 py-2 rounded-lg peer-checked:bg-white peer-checked:shadow-sm peer-checked:text-slate-900 transition-all text-xs font-bold text-slate-500 hover:text-slate-700">
                             Я Разработчик
                         </div>
                     </label>
                 </div>
-                {actionData?.fieldErrors?.role && <p className="text-red-500 text-xs mt-1">{actionData.fieldErrors.role[0]}</p>}
+                {actionData?.fieldErrors?.role && <p className="text-red-500 text-[10px] font-medium mt-1 pl-1">{actionData.fieldErrors.role[0]}</p>}
 
-                <Input label="Имя и Фамилия" name="name" required placeholder="Иван Иванов" error={actionData?.fieldErrors?.name?.[0]} />
-                <Input label="Логин" name="login" required placeholder="ivan_dev" error={actionData?.fieldErrors?.login?.[0]} />
+                {/* Раздельные поля для Имени и Фамилии */}
+                <div className="grid grid-cols-2 gap-4">
+                    <Input
+                        label="Имя"
+                        name="name"
+                        required
+                        placeholder="Иван"
+                        error={actionData?.fieldErrors?.name?.[0]}
+                    />
+                    <Input
+                        label="Фамилия"
+                        name="surname"
+                        placeholder="Иванов (опц.)"
+                        error={actionData?.fieldErrors?.surname?.[0]}
+                    />
+                </div>
+
+                <Input label="Логин" name="login" required minLength={3} placeholder="ivan_dev" error={actionData?.fieldErrors?.login?.[0]} />
                 <Input label="Email" name="email" type="email" required placeholder="ivan@example.com" error={actionData?.fieldErrors?.email?.[0]} />
-                <Input label="Телефон" name="phoneNumber" required placeholder="89001234567" error={actionData?.fieldErrors?.phoneNumber?.[0]} />
-                <Input label="Пароль" name="password" type="password" required placeholder="••••••••" error={actionData?.fieldErrors?.password?.[0]} />
+
+                <Input
+                    label="Телефон"
+                    name="phoneNumber"
+                    required
+                    pattern="^89\d{9}$"
+                    placeholder="89001234567"
+                    error={actionData?.fieldErrors?.phoneNumber?.[0]}
+                    title="Формат: 89XXXXXXXXX"
+                />
+
+                <Input label="Пароль" name="password" type="password" required minLength={6} placeholder="••••••••" error={actionData?.fieldErrors?.password?.[0]} />
 
                 <Button type="submit" variant="primary" disabled={isSubmitting} className="w-full py-3 mt-6">
                     {isSubmitting ? "Создание..." : "Зарегистрироваться"}
                 </Button>
             </Form>
 
-            <p className="text-center text-sm text-slate-500 mt-6">
-                Уже есть аккаунт? <Link to="/login" className="text-blue-600 hover:underline">Войти</Link>
-            </p>
+            <div className="mt-8 pt-6 border-t border-slate-100 text-center">
+                <p className="text-xs text-slate-500 font-medium">
+                    Уже есть аккаунт? <Link to="/login" className="text-blue-600 font-bold hover:underline">Войти</Link>
+                </p>
+            </div>
         </div>
     );
 }

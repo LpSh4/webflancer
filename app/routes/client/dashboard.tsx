@@ -1,8 +1,8 @@
-import { useLoaderData, Link } from "react-router";
-import type { Route } from "./+types/dashboard";
-import { getUser } from "~/shared/utils/auth.server";
-import { api } from "~/shared/utils/api.server";
-import { FolderKanban, CheckCircle2, LayoutGrid, ArrowRight } from "lucide-react";
+import {useLoaderData, Link} from "react-router";
+import type {Route} from "./+types/dashboard";
+import {getUser} from "~/shared/utils/auth.server";
+import {api} from "~/shared/utils/api.server";
+import {FolderKanban, CheckCircle2, LayoutGrid, ArrowRight} from "lucide-react";
 
 interface Commission {
     id: string;
@@ -13,15 +13,15 @@ interface Commission {
     createdAt: string;
 }
 
-export async function loader({ request }: Route.LoaderArgs) {
-    const { user } = await getUser(request);
+export async function loader({request}: Route.LoaderArgs) {
+    const {user} = await getUser(request);
     const cookieHeader = request.headers.get("Cookie");
 
     let commissions: Commission[] = [];
 
     try {
         const response = await api.get(`/commissions/user/${user.id}`, {
-            headers: { Cookie: cookieHeader }
+            headers: {Cookie: cookieHeader}
         });
         commissions = response.data;
     } catch (error) {
@@ -45,7 +45,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export default function ClientDashboard() {
-    const { user, commissions, stats } = useLoaderData<typeof loader>();
+    const {user, commissions, stats} = useLoaderData<typeof loader>();
 
     return (
         <div className="p-6 bg-slate-50 min-h-screen">
@@ -54,9 +54,11 @@ export default function ClientDashboard() {
                 <div className="mb-6 flex justify-between items-end">
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900">Панель управления заказами</h1>
-                        <p className="text-xs text-slate-500 mt-1">Добро пожаловать, <span className="font-semibold text-slate-700">{user.displayedName}</span></p>
+                        <p className="text-xs text-slate-500 mt-1">Добро пожаловать, <span
+                            className="font-semibold text-slate-700">{user.displayedName}</span></p>
                     </div>
-                    <Link to="/commissions" className="bg-slate-900 text-white text-xs px-4 py-2 rounded-lg font-semibold hover:bg-slate-800 transition-colors shadow-sm">
+                    <Link to="/commissions"
+                          className="bg-slate-900 text-white text-xs px-4 py-2 rounded-lg font-semibold hover:bg-slate-800 transition-colors shadow-sm">
                         + Создать заказ
                     </Link>
                 </div>
@@ -65,30 +67,35 @@ export default function ClientDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
                         <div className="p-3 bg-slate-100 text-slate-700 rounded-lg">
-                            <LayoutGrid className="w-5 h-5" />
+                            <LayoutGrid className="w-5 h-5"/>
                         </div>
                         <div>
-                            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Всего проектов</div>
+                            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Всего
+                                проектов
+                            </div>
                             <div className="text-2xl font-black text-slate-900 mt-0.5">{stats.total}</div>
                         </div>
                     </div>
 
                     <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
                         <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
-                            <FolderKanban className="w-5 h-5" />
+                            <FolderKanban className="w-5 h-5"/>
                         </div>
                         <div>
-                            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Открыто / Ищут</div>
+                            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Открыто /
+                                Ищут
+                            </div>
                             <div className="text-2xl font-black text-slate-900 mt-0.5">{stats.posted}</div>
                         </div>
                     </div>
 
                     <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
                         <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
-                            <CheckCircle2 className="w-5 h-5" />
+                            <CheckCircle2 className="w-5 h-5"/>
                         </div>
                         <div>
-                            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Завершено</div>
+                            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Завершено
+                            </div>
                             <div className="text-2xl font-black text-slate-900 mt-0.5">{stats.completed}</div>
                         </div>
                     </div>
@@ -115,9 +122,15 @@ export default function ClientDashboard() {
                         ) : (
                             commissions.map((c) => (
                                 <tr key={c.id} className="hover:bg-slate-50/50 transition-colors">
-                                    <td className="p-4 font-bold text-slate-900">{c.title}</td>
+                                    <td className="p-4 font-bold text-slate-900">
+                                        <Link to={`/commissions/${c.id}`}
+                                              className="hover:text-blue-600 hover:underline">
+                                            {c.title}
+                                        </Link>
+                                    </td>
                                     <td className="p-4">
-                                        <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-bold uppercase text-[9px] border border-blue-100">
+                                        <span
+                                            className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-bold uppercase text-[9px] border border-blue-100">
                                             {c.commissionProgress}
                                         </span>
                                     </td>
@@ -127,7 +140,7 @@ export default function ClientDashboard() {
                                             to={`/commissions/${c.id}`}
                                             className="inline-flex items-center gap-1 text-slate-900 font-bold hover:underline"
                                         >
-                                            Управление <ArrowRight className="w-3 h-3" />
+                                            Управление <ArrowRight className="w-3 h-3"/>
                                         </Link>
                                     </td>
                                 </tr>

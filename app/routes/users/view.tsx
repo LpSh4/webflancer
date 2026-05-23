@@ -125,7 +125,7 @@ export default function PublicProfilePage() {
                             </div>
                         )}
 
-                        {/* Социальные сети разработчика (Инлайновые чистые SVG) */}
+                        {/* Социальные сети разработчика */}
                         {user.role === "DEVELOPER" && (user.socialGitHub || user.socialLinkedIn || user.socialX) && (
                             <div>
                                 <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Контакты и сети</h3>
@@ -182,6 +182,33 @@ export default function PublicProfilePage() {
                                 </div>
                             </div>
                         )}
+
+                        {/* Отзывы (Заглушка) */}
+                        <div className="pt-8 border-t border-slate-100 mt-8">
+                            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 mb-4">
+                                <Star className="w-4 h-4 text-amber-500 fill-amber-500" /> Отзывы (2)
+                            </h3>
+                            <div className="space-y-4">
+                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div className="font-bold text-xs text-slate-900">Крипто Инвест</div>
+                                        <div className="text-[10px] text-slate-400">12 мая 2026</div>
+                                    </div>
+                                    <p className="text-xs text-slate-600 leading-relaxed">
+                                        Сделал лендинг вовремя, правки внес без проблем. Рекомендую.
+                                    </p>
+                                </div>
+                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div className="font-bold text-xs text-slate-900">Иван Петров</div>
+                                        <div className="text-[10px] text-slate-400">01 апр 2026</div>
+                                    </div>
+                                    <p className="text-xs text-slate-600 leading-relaxed">
+                                        Всё супер! Качество кода отличное.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
 
                     </div>
                 </div>

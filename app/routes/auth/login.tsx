@@ -20,20 +20,15 @@ export async function action({ request }: Route.ActionArgs) {
     }
 
     try {
-        console.log(`\n🚀 [LOGIN ACTION] Отправляем POST на бэкенд...`);
         const response = await api.post('/auth/login', result.data);
 
-        const setCookieHeaders = response.headers['set-cookie'] || response.headers.get?.('set-cookie');
+        const setCookieHeaders = response.headers['set-cookie'];
         const headers = new Headers();
 
         if (setCookieHeaders) {
             const cookiesArray = Array.isArray(setCookieHeaders) ? setCookieHeaders : [setCookieHeaders];
-
             cookiesArray.forEach(cookie => {
-                // РЕГУЛЯРКА: Вырезаем "; Expires=..." вместе с его запятой, оставляя только Max-Age
                 const cleanCookie = cookie.replace(/;\s*expires=[^;]+/gi, '');
-
-                console.log(`   - Отправляем в браузер чистую куку: ${cleanCookie.substring(0, 40)}...`);
                 headers.append('Set-Cookie', cleanCookie);
             });
         }
@@ -42,9 +37,7 @@ export async function action({ request }: Route.ActionArgs) {
         const redirectUrl = role === 'CLIENT' ? '/client/dashboard' : '/developer/dashboard';
 
         return redirect(redirectUrl, { headers });
-
     } catch (error: any) {
-        console.error("🚨 Ошибка при логине:", error.message);
         return {
             error: error.response?.data?.message || "Неверный логин или пароль.",
             fieldErrors: null,
@@ -57,10 +50,12 @@ export default function LoginPage() {
         <div className="flex items-center justify-center min-h-screen bg-slate-50 p-4">
             <div className="w-full max-w-md">
                 <div className="flex justify-center mb-8">
-                    <Logo size="md" className="text-slate-900" />
+                    <Link to="/" className="hover:opacity-90 transition-opacity">
+                        <Logo size="md" className="text-slate-900" />
+                    </Link>
                 </div>
                 <LoginCard />
-                <p className="text-center text-slate-400 text-xs mt-8 font-medium">
+                <p className="text-center text-slate-400 text-xs mt-8 font-medium tracking-wide">
                     © 2026 Webflancer Digital System
                 </p>
             </div>
@@ -75,20 +70,21 @@ function LoginCard() {
 
     return (
         <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
-            <h2 className="text-2xl font-semibold text-slate-900 mb-2">С возвращением</h2>
-            <p className="text-slate-500 text-sm mb-6">Войдите в систему, чтобы продолжить работу</p>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2 tracking-tight text-center">С возвращением</h2>
+            <p className="text-slate-500 text-xs mb-6 text-center">Войдите в систему, чтобы продолжить работу</p>
 
             {actionData?.error && (
-                <div className="mb-6 p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-sm text-center">
+                <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-xs font-medium text-center shadow-sm">
                     {actionData.error}
                 </div>
             )}
 
-            <Form method="post" className="space-y-5">
+            <Form method="post" className="space-y-4">
                 <Input
                     label="Логин"
                     name="login"
                     required
+                    minLength={3}
                     placeholder="Укажите ваш логин"
                     error={actionData?.fieldErrors?.login?.[0]}
                 />
@@ -98,6 +94,7 @@ function LoginCard() {
                     name="password"
                     type="password"
                     required
+                    minLength={6}
                     placeholder="••••••••"
                     error={actionData?.fieldErrors?.password?.[0]}
                 />
@@ -112,9 +109,11 @@ function LoginCard() {
                 </Button>
             </Form>
 
-            <p className="text-center text-sm text-slate-500 mt-6">
-                Нет аккаунта? <Link to="/register" className="text-blue-600 hover:underline">Зарегистрироваться</Link>
-            </p>
+            <div className="mt-8 pt-6 border-t border-slate-100 text-center">
+                <p className="text-xs text-slate-500 font-medium">
+                    Нет аккаунта? <Link to="/register" className="text-blue-600 font-bold hover:underline">Зарегистрироваться</Link>
+                </p>
+            </div>
         </div>
     );
 }

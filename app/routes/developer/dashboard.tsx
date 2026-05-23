@@ -106,7 +106,9 @@ export default function DeveloperDashboard() {
                             {bids.map((bid) => (
                                 <div key={bid.id} className="p-4 flex justify-between items-center text-xs">
                                     <div>
-                                        <div className="font-bold text-slate-900">Ставка на заказ #{bid.commissionId.substring(0, 8)}</div>
+                                        <Link to={`/commissions/${bid.commissionId}`} className="font-bold text-blue-600 hover:underline">
+                                            Перейти к заказу #{bid.commissionId.substring(0, 8)}
+                                        </Link>
                                         <div className="text-slate-400 mt-1">Отправлено: {new Date(bid.createdAt).toLocaleDateString("ru-RU")}</div>
                                     </div>
                                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
