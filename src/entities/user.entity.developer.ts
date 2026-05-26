@@ -3,6 +3,7 @@ import type { Relation } from "typeorm";
 import { Role, User } from "./user.entity";
 import { Commission } from "./commission.entity";
 import { Bid } from "./bid.entity";
+import { Review } from "./review.entity";
 
 @ChildEntity(Role.DEVELOPER)
 export class Developer extends User {
@@ -29,4 +30,9 @@ export class Developer extends User {
 
   @OneToMany(() => Bid, (bid) => bid.developer)
   bids?: Relation<Bid[]>;
+
+  @OneToMany(() => Review, (review) => review.developer, {
+    onDelete: "CASCADE",
+  })
+  reviews?: Relation<Review[]>;
 }

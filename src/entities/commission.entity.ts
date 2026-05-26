@@ -7,6 +7,7 @@ import { Bid } from "./bid.entity";
 import { CommissionLog } from "./log.commission.entity";
 import { CommissionProposal } from "./commission.entity.proposals";
 import { CommissionProgress, CommissionWorkStatus } from "./commission.enums";
+import { Review } from "./review.entity";
 
 export enum CommissionType {
   // Simple / Content Focused
@@ -125,4 +126,9 @@ export class Commission extends BaseEntity {
     onDelete: "CASCADE",
   })
   proposals?: Relation<CommissionProposal[]>;
+
+  @OneToMany(() => Review, (review) => review.commission, {
+    onDelete: "CASCADE",
+  })
+  reviews?: Relation<Review[]>;
 }

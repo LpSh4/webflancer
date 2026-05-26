@@ -62,6 +62,9 @@ export class User extends BaseEntity {
   })
   averageRating?: number;
 
+  @Column({ type: "int", default: 0 })
+  reviewCount!: number;
+
   @OneToMany(() => UserLog, (userLog) => userLog.user, {
     onDelete: "CASCADE",
   })
