@@ -3,26 +3,27 @@ import { UpdateUserData } from "./user.types";
 import { UserRepository } from "./user.repository";
 import { NotFoundError } from "../../errors/errors";
 import { User } from "../../entities/user.entity";
-import { LoggerService } from "../log/logger.service";
-import { LogTypes } from "../../entities/log.base.entity";
+import { NotificationType } from "../../entities/notification.entity";
+import { NotificationService } from "../notification/notification.service";
 
 export class UserService {
   constructor(
     private em: EntityManager,
     private userRepo: UserRepository,
-    private loggerService: LoggerService,
+    private notificationService: NotificationService,
   ) {}
 
   async updateUser(userId: string, data: UpdateUserData): Promise<User> {
     return this.em.transaction(async (trxEm): Promise<User> => {
       const updated = await this.userRepo.update(userId, data, trxEm);
       if (!updated) throw new NotFoundError("User not found");
-      await this.loggerService.createUserLog(
+
+      await this.notificationService.createNotification(
         {
-          targetId: userId,
-          type: LogTypes.SYSTEM,
-          title: "User info updated",
-          content: "User profile info has been updated.",
+          recipientId: userId,
+          title: "Профиль обновлён! ✨",
+          message: `Содержимое профиля было обновлено.`,
+          type: NotificationType.SYSTEM,
         },
         trxEm,
       );
@@ -40,12 +41,12 @@ export class UserService {
     return manager.transaction(async (trxEm): Promise<User> => {
       const updated = await this.userRepo.changeEmail(userId, email);
       if (!updated) throw new NotFoundError("User not found");
-      await this.loggerService.createUserLog(
+      await this.notificationService.createNotification(
         {
-          targetId: userId,
-          type: LogTypes.SYSTEM,
-          title: "User info updated",
-          content: "User email has been updated.",
+          recipientId: userId,
+          title: "Email обновлён! ✨",
+          message: `Ваша почта обновлена.`,
+          type: NotificationType.SYSTEM,
         },
         trxEm,
       );
@@ -56,19 +57,26 @@ export class UserService {
   async updateProfilePicture(
     userId: string,
     profilePicture: string,
+    em?: EntityManager,
   ): Promise<User> {
-    const updated = await this.userRepo.changeProfilePicture(
-      userId,
-      profilePicture,
-    );
-    if (!updated) throw new NotFoundError("User not found");
-    await this.loggerService.createUserLog({
-      targetId: userId,
-      type: LogTypes.SYSTEM,
-      title: "User info updated",
-      content: "User profile picture has been updated.",
+    const manager = em ?? this.em;
+    return manager.transaction(async (trxEm): Promise<User> => {
+      const updated = await this.userRepo.changeProfilePicture(
+        userId,
+        profilePicture,
+      );
+      if (!updated) throw new NotFoundError("User not found");
+      await this.notificationService.createNotification(
+        {
+          recipientId: userId,
+          title: "Аватар обновлён! ✨",
+          message: `Содержимое профиля было обновлено.`,
+          type: NotificationType.SYSTEM,
+        },
+        trxEm,
+      );
+      return updated;
     });
-    return updated;
   }
 
   async getUser(userId: string): Promise<User> {
