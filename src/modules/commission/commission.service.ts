@@ -7,16 +7,34 @@ import {
   CommissionSearchQuery,
   CommissionSearchResponse,
 } from "./schemas/commission.schema";
+import { NotificationType } from "../../entities/notification.entity";
+import { NotificationService } from "../notification/notification.service";
 
 export class CommissionService {
   constructor(
     private em: EntityManager,
     private commissionRepo: CommissionRepository,
+    private notificationService: NotificationService,
   ) {}
 
   async createCommission(data: CreateCommissionData): Promise<Commission> {
     return this.em.transaction(async (trxEm): Promise<Commission> => {
-      return await this.commissionRepo.createCommission(data, trxEm);
+      const commission = await this.commissionRepo.createCommission(
+        data,
+        trxEm,
+      );
+
+      await this.notificationService.createNotification(
+        {
+          recipientId: commission.clientId,
+          title: "Заказ создан 🎉",
+          message: `Заказ "${commission.title}" успешно создан! Следите за откликами!`,
+          type: NotificationType.COMMISSION_UPDATE,
+        },
+        trxEm,
+      );
+
+      return commission;
     });
   }
 
@@ -42,7 +60,36 @@ export class CommissionService {
 
   async completeCommission(id: string, userId: string): Promise<UpdateResult> {
     return this.em.transaction(async (trxEm): Promise<UpdateResult> => {
-      return await this.commissionRepo.completeCommission(id, userId, trxEm);
+      const result = await this.commissionRepo.completeCommission(
+        id,
+        userId,
+        trxEm,
+      );
+      const commission = await this.commissionRepo.findById(id, trxEm);
+
+      await this.notificationService.createNotification(
+        {
+          recipientId: commission.clientId,
+          title: "Заказ выполнен 🎉",
+          message: `Статус заказа "${commission.title}" был изменён на "Выполнен"!`,
+          type: NotificationType.COMMISSION_UPDATE,
+        },
+        trxEm,
+      );
+
+      if (commission.developerId) {
+        await this.notificationService.createNotification(
+          {
+            recipientId: commission.developerId,
+            title: "Заказ выполнен 🎉",
+            message: `Автор заказа "${commission.title}" изменил статус на "Выполнен". Хорошая работа!`,
+            type: NotificationType.COMMISSION_UPDATE,
+          },
+          trxEm,
+        );
+      }
+
+      return result;
     });
   }
 

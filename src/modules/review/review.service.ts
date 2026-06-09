@@ -9,39 +9,21 @@ export class ReviewService {
     private em: EntityManager,
   ) {}
 
-  async createReview(
-    data: CreateReviewData,
-    em?: EntityManager,
-  ): Promise<Review> {
-    const manager = em ?? this.em;
-
-    return manager.transaction(async (trxEm): Promise<Review> => {
+  async createReview(data: CreateReviewData): Promise<Review> {
+    return this.em.transaction(async (trxEm): Promise<Review> => {
       return this.reviewRepo.createReview(data, trxEm);
     });
   }
 
-  async getById(id: string, em?: EntityManager): Promise<Review> {
-    const manager = em ?? this.em;
-
-    return this.reviewRepo.getById(id, manager);
+  async getById(id: string): Promise<Review> {
+    return this.reviewRepo.getById(id, this.em);
   }
 
-  async getByCommissionId(
-    commissionId: string,
-    em?: EntityManager,
-  ): Promise<Review> {
-    const manager = em ?? this.em;
-
-    return manager.transaction(async (trxEm): Promise<Review> => {
-      return this.reviewRepo.getByCommissionId(commissionId, trxEm);
-    });
+  async getByCommissionId(commissionId: string): Promise<Review> {
+    return this.reviewRepo.getByCommissionId(commissionId, this.em);
   }
 
-  async getByUserId(userId: string, em?: EntityManager): Promise<Review[]> {
-    const manager = em ?? this.em;
-
-    return manager.transaction(async (trxEm): Promise<Review[]> => {
-      return this.reviewRepo.getByUserId(userId, trxEm);
-    });
+  async getByUserId(userId: string): Promise<Review[]> {
+    return this.reviewRepo.getByUserId(userId, this.em);
   }
 }

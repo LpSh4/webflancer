@@ -33,7 +33,7 @@ export async function reviewRoutes(fastify: FastifyInstance) {
   );
 
   fastify.get<{ Params: { targetId: string } }>(
-    "/id/:targetId",
+    "/:targetId",
     {
       schema: getByIdSchema,
     },

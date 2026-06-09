@@ -5,9 +5,16 @@ import { Commission } from "./commission.entity";
 import { Client } from "./user.entity.client";
 import { Developer } from "./user.entity.developer";
 
+// Add this helper transformer at the top of your entity file
+const numericTransformer = {
+  to: (value: number | null) => value,
+  from: (value: string | null) => (value ? parseFloat(value) : null),
+};
+
 @Entity("review")
+// Update the check constraint to ignore null values safely
 @Check(
-  `"clientRating" >= 0 AND "clientRating" <= 5 AND "developerRating" >= 0 AND "developerRating" <= 5`,
+  `("clientRating" IS NULL OR ("clientRating" >= 0 AND "clientRating" <= 5)) AND ("developerRating" IS NULL OR ("developerRating" >= 0 AND "developerRating" <= 5))`,
 )
 @Unique(["clientId", "commissionId"])
 @Unique(["developerId", "commissionId"])
@@ -21,8 +28,9 @@ export class Review extends BaseEntity {
   @JoinColumn({ name: "commission_id" })
   commission!: Relation<Commission>;
 
-  @Column("varchar", { nullable: false, name: "client_id" })
-  clientId?: string;
+  // Changed to nullable: true 👇
+  @Column("varchar", { nullable: true, name: "client_id" })
+  clientId?: string | null;
 
   @ManyToOne(() => Client, (client) => client.reviews, { onDelete: "CASCADE" })
   @JoinColumn({ name: "client_id" })
@@ -31,11 +39,9 @@ export class Review extends BaseEntity {
   @Column("varchar", { length: 255, nullable: true })
   clientReview?: string | null;
 
-  @Column("numeric", { precision: 2, scale: 1, default: 5, nullable: false })
-  clientRating?: number;
-
-  @Column("varchar", { nullable: false, name: "developer_id" })
-  developerId?: string;
+  // Changed to nullable: true 👇
+  @Column("varchar", { nullable: true, name: "developer_id" })
+  developerId?: string | null;
 
   @ManyToOne(() => Developer, (developer) => developer.reviews, {
     onDelete: "CASCADE",
@@ -46,6 +52,22 @@ export class Review extends BaseEntity {
   @Column("varchar", { length: 255, nullable: true })
   developerReview?: string | null;
 
-  @Column("numeric", { precision: 2, scale: 1, default: 5, nullable: false })
-  developerRating?: number;
+  // Then use it inside your Review Entity class:
+  @Column("numeric", {
+    precision: 2,
+    scale: 1,
+    nullable: true,
+    default: null,
+    transformer: numericTransformer, // 👈 Adds casting hook here
+  })
+  clientRating?: number | null;
+
+  @Column("numeric", {
+    precision: 2,
+    scale: 1,
+    nullable: true,
+    default: null,
+    transformer: numericTransformer, // 👈 And here
+  })
+  developerRating?: number | null;
 }

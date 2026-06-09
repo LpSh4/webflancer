@@ -67,8 +67,8 @@ export const getByIdSchema = {
   params: {
     type: "object",
     properties: {
-      id: { type: "string", format: "uuid" }, // Enforces UUID format
+      targetId: { type: "string", format: "uuid" }, // Enforces UUID format
     },
-    required: ["id"],
+    required: ["targetId"],
   },
 };

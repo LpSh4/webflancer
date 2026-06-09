@@ -2,17 +2,38 @@ import { BidRepository } from "./bid.repository";
 import { EntityManager, UpdateResult } from "typeorm";
 import { CreateBidData } from "./bid.types";
 import { Bid } from "../../entities/bid.entity";
+import { NotificationService } from "../notification/notification.service";
+import { CommissionRepository } from "../commission/commission.repository";
+import { NotificationType } from "../../entities/notification.entity";
 
 export class BidService {
   constructor(
     private bidRepo: BidRepository,
     private em: EntityManager,
+    private notificationService: NotificationService,
+    private commissionRepo: CommissionRepository,
   ) {}
 
   async createBid(data: CreateBidData, em?: EntityManager): Promise<Bid> {
     const manager = em ?? this.em;
     return manager.transaction(async (trxEm): Promise<Bid> => {
-      return await this.bidRepo.CreateBid(data, trxEm);
+      const bid = await this.bidRepo.CreateBid(data, trxEm);
+      const commission = await this.commissionRepo.findById(
+        data.targetId,
+        trxEm,
+      );
+
+      await this.notificationService.createNotification(
+        {
+          recipientId: commission.clientId,
+          title: "Новый отклик 💰",
+          message: `Разработчик оставил отклик на заказ "${commission.title}".`,
+          type: NotificationType.BID_UPDATE,
+        },
+        trxEm,
+      );
+
+      return bid;
     });
   }
 
@@ -23,7 +44,22 @@ export class BidService {
   ): Promise<Bid> {
     const manager = em ?? this.em;
     return manager.transaction(async (trxEm): Promise<Bid> => {
-      return await this.bidRepo.acceptBid(targetId, userId, trxEm);
+      const bid = await this.bidRepo.acceptBid(targetId, userId, trxEm);
+      const commission = await this.commissionRepo.findById(targetId, trxEm);
+
+      if (commission.developerId) {
+        await this.notificationService.createNotification(
+          {
+            recipientId: commission.developerId,
+            title: "Отклик принят",
+            message: `Ваш отклик на заказ "${commission.title}" был принят.`,
+            type: NotificationType.BID_UPDATE,
+          },
+          trxEm,
+        );
+      }
+
+      return bid;
     });
   }
 

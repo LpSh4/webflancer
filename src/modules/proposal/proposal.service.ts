@@ -5,11 +5,16 @@ import {
   CommissionWorkStatus,
   ProposalStatus,
 } from "../../entities/commission.enums";
+import { NotificationService } from "../notification/notification.service";
+import { CommissionService } from "../commission/commission.service";
+import { NotificationType } from "../../entities/notification.entity";
 
 export class ProposalService {
   constructor(
     private em: EntityManager,
     private proposalRepo: ProposalRepository,
+    private notificationService: NotificationService,
+    private commissionService: CommissionService,
   ) {}
 
   async createProposal(
@@ -21,12 +26,25 @@ export class ProposalService {
     const manager = em ?? this.em;
 
     return manager.transaction(async (trxEm): Promise<CommissionProposal> => {
-      return this.proposalRepo.createProposal(
+      const proposal = this.proposalRepo.createProposal(
         targetId,
         userId,
         workStatus,
         trxEm,
       );
+      const commission = await this.commissionService.getCommission(targetId);
+
+      await this.notificationService.createNotification(
+        {
+          recipientId: commission.clientId,
+          title: "Разработчик обновил прогресс!",
+          message: `Прогресс заказа "${commission.title}" был обновлён.`,
+          type: NotificationType.PROPOSAL_UPDATE,
+        },
+        trxEm,
+      );
+
+      return proposal;
     });
   }
 
@@ -39,7 +57,27 @@ export class ProposalService {
     const manager = em ?? this.em;
 
     return manager.transaction(async (trxEm): Promise<CommissionProposal> => {
-      return this.proposalRepo.changeStatus(targetId, userId, status, trxEm);
+      const proposal = this.proposalRepo.changeStatus(
+        targetId,
+        userId,
+        status,
+        trxEm,
+      );
+
+      const commission = await this.commissionService.getCommission(targetId);
+      if (commission.developerId) {
+        await this.notificationService.createNotification(
+          {
+            recipientId: commission.developerId,
+            title: "Изменение статуса прогресса",
+            message: `Автор заказа "${commission.title}" изменил статус прогресса.`,
+            type: NotificationType.PROPOSAL_UPDATE,
+          },
+          trxEm,
+        );
+      }
+
+      return proposal;
     });
   }
 
