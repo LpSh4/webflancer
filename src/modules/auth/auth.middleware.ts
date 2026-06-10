@@ -8,7 +8,6 @@ declare module "fastify" {
   }
 }
 export const authenticate = async (req: FastifyRequest) => {
-  // Check cookie first, fallback to Header for flexibility (like mobile apps)
   const token =
     req.cookies["access_token"] || req.headers.authorization?.split(" ")[1];
 

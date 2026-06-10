@@ -53,10 +53,10 @@ export class UserController {
   };
 
   getUser = async (
-    req: FastifyRequest<{ Params: { id: string } }>,
+    req: FastifyRequest<{ Params: { targetId: string } }>,
     res: FastifyReply,
   ): Promise<User> => {
-    const user = await this.userService.getUser(req.params.id);
+    const user = await this.userService.getUser(req.params.targetId);
     return res.status(200).send(user);
   };
 }
