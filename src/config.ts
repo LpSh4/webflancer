@@ -25,10 +25,12 @@ interface Config {
 
 const config: Config = {
   node_env: process.env["NODE_ENV"] || "development",
-  host: process.env["NODE_ENV"] === "production" ? "0.0.0.0" : "localhost",
+  // Меняем localhost на 0.0.0.0, чтобы слушать все интерфейсы (IPv4 и IPv6)
+  host: "0.0.0.0",
   port: 3000,
   apiPrefix: "api/v1",
-  frontendUrl: "api/v1",
+  // Указываем реальный адрес фронтенда по умолчанию
+  frontendUrl: process.env["FRONTEND_URL"] ?? "http://localhost:5173",
   db: {
     username: process.env["DB_USERNAME"] ?? "postgres",
     password: process.env["DB_PASSWORD"] ?? "postgres",

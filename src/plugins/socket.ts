@@ -16,9 +16,11 @@ const ioPlugin: FastifyPluginAsync = async (fastify: FastifyInstance) => {
       // Передаем функцию валидации origin, которая пропустит и фронтенд, и локальную разработку
       origin: (requestOrigin, callback) => {
         const allowedOrigins = [
-          config.frontendUrl,
+          config.frontendUrl, // Теперь тут "http://localhost:5173"
           "https://ryban.ru",
           "http://localhost:3000",
+          "http://localhost:5173", // На всякий случай дублируем явным образом
+          "http://127.0.0.1:5173", // Для поддержки IPv4 путей Vite
         ];
 
         // Если запрос без origin (например, мобильное приложение или curl), либо он в списке разрешенных
