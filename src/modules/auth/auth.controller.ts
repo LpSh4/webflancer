@@ -62,28 +62,45 @@ export class AuthController {
       await this.authService.logout(refreshToken);
     }
 
+    const isProd = config.node_env === "production";
+
+    const cookieOptions = {
+      path: "/",
+      ...(isProd ? { domain: ".ryban.ru" } : {}),
+    };
+
     return res
-      .clearCookie("access_token", { path: "/" })
-      .clearCookie("refresh_token", { path: "/" })
+      .clearCookie("access_token", cookieOptions)
+      .clearCookie("refresh_token", cookieOptions)
       .status(200)
       .send({ success: true });
   };
 
   private setAuthCookies(res: FastifyReply, tokens: LoginTokens) {
-    res.setCookie("access_token", tokens.accessToken, {
-      path: "/",
-      httpOnly: true,
-      secure: config.node_env === "production",
-      sameSite: "lax",
-      maxAge: 900,
-    });
+    const isProd = config.node_env === "production";
 
-    res.setCookie("refresh_token", tokens.refreshToken, {
+    // Базовые настройки для любой среды
+    const baseOptions = {
       path: "/",
       httpOnly: true,
-      secure: config.node_env === "production",
-      sameSite: "lax",
+      secure: isProd,
+      sameSite: (isProd ? "none" : "lax") as "none" | "lax",
+    };
+
+    // Динамически собираем финальные объекты, чтобы избежать передачи undefined
+    const accessCookieOptions = {
+      ...baseOptions,
+      maxAge: 900,
+      ...(isProd ? { domain: ".ryban.ru" } : {}),
+    };
+
+    const refreshCookieOptions = {
+      ...baseOptions,
       maxAge: 604800, // 7 days
-    });
+      ...(isProd ? { domain: ".ryban.ru" } : {}),
+    };
+
+    res.setCookie("access_token", tokens.accessToken, accessCookieOptions);
+    res.setCookie("refresh_token", tokens.refreshToken, refreshCookieOptions);
   }
 }
