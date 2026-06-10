@@ -18,6 +18,7 @@ import ioPlugin from "./plugins/socket";
 interface FastifyOptions {
   logger: any;
   ajv: any;
+  trustProxy: true;
 }
 
 declare module "fastify" {
