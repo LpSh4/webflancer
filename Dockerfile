@@ -13,6 +13,13 @@ RUN apk add --no-cache libc6-compat
 COPY package*.json ./
 RUN npm ci
 
+ARG VITE_SOCKET_URL
+ARG VITE_API_BASE_URL
+
+# Переводим их в ENV, чтобы npm run build их увидел
+ENV VITE_SOCKET_URL=${VITE_SOCKET_URL}
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+
 # 4. Копируем исходники и собираем проект
 COPY . .
 RUN npm run build

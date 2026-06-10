@@ -11,15 +11,16 @@ export default defineConfig({
     server: {
         proxy: {
             '/api': {
-                target: 'https://backend.ryban.ru',
+                // Если тестируешь локально — шлем на 3000, если нет — на прод
+                target: process.env.VITE_API_BASE_URL ? 'http://localhost:3000' : 'https://backend.ryban.ru',
                 changeOrigin: true,
                 secure: false,
             },
             '/api/v1/socket.io': {
-                target: 'https://backend.ryban.ru',
+                target: 'http://localhost:3000', // Локальный сервер Fastify
                 changeOrigin: true,
                 secure: false,
-                ws: true,
+                ws: true, // Включает поддержку вебсокетов в прокси Vite
             }
         }
     }
