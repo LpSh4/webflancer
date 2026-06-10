@@ -4,9 +4,13 @@ let socket: Socket | null = null;
 
 export const getSocket = () => {
     if (!socket) {
-        // Пустая строка заставит сокет слать запросы на http://localhost:5173/api/v1/socket.io
-        // А Vite проксирует это на http://0.0.0.0:3000/api/v1/socket.io благодаря твоим настройкам в vite.config.ts
-        socket = io(import.meta.env.DEV ? '' : (import.meta.env.VITE_SOCKET_URL || ''), {
+        // Если мы в DEV-режиме — шлем пустую строку (работает прокси Vite)
+        // Если в PROD — берем VITE_SOCKET_URL, а если она пустая, жестко подставляем прод-домен бэка
+        const targetUrl = import.meta.env.DEV
+            ? ''
+            : (import.meta.env.VITE_SOCKET_URL || 'https://backend.ryban.ru');
+
+        socket = io(targetUrl, {
             path: '/api/v1/socket.io',
             withCredentials: true,
             autoConnect: false,
