@@ -36,4 +36,4 @@ COPY --from=builder /app/node_modules ./node_modules
 EXPOSE 3000
 
 # Запускаем сервер напрямую через ноду, чтобы избежать лишних сетевых оверхедов npx в продакшене
-CMD ["node", "./node_modules/.bin/react-router-serve", "./build/server/index.js", "--host", "0.0.0.0"]
+CMD ["pnpm", "react-router-serve", "./build/server/index.js", "--host", "0.0.0.0"]
