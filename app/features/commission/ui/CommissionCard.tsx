@@ -1,4 +1,6 @@
+// /features/commission/CommissionCard.tsx
 import { Link } from "react-router";
+import { COMMISSION_PROGRESS_LABELS } from "../commission.constants";
 
 interface CommissionCardProps {
     commission: {
@@ -11,17 +13,42 @@ interface CommissionCardProps {
         budgetMax: number | null;
         createdAt: string;
     };
-    viewerRole?: string; // Добавили роль!
+    viewerRole?: string;
 }
 
 export function CommissionCard({ commission, viewerRole }: CommissionCardProps) {
-    const isPosted = commission.commissionProgress === "POSTED";
-    const isCompleted = commission.commissionProgress === "DEVELOPMENT_COMPLETE";
+    const progress = commission.commissionProgress;
+    const isPosted = progress === "POSTED";
 
     // Умный текст для ссылки
     const actionText = viewerRole === "CLIENT"
         ? "Управление →"
         : (isPosted ? "Откликнуться →" : "Подробности →");
+
+    // Функция для динамического подбора цвета бэйджа статуса
+    const getStatusStyles = (status: string) => {
+        switch (status) {
+            case "POSTED":
+                return "bg-emerald-50 text-emerald-700 border-emerald-100";
+            case "CONTRACT_STARTED":
+            case "DEVELOPMENT":
+            case "TESTING":
+                return "bg-blue-50 text-blue-700 border-blue-100";
+            case "DEV_COMPLETE":
+                return "bg-amber-50 text-amber-700 border-amber-100";
+            case "COMPLETED":
+                return "bg-slate-100 text-slate-600 border-slate-200";
+            case "CANCELLED":
+            case "DISPUTED":
+            case "REFUNDED":
+                return "bg-red-50 text-red-700 border-red-100";
+            default:
+                return "bg-slate-50 text-slate-500 border-slate-200";
+        }
+    };
+
+    // Получаем человекочитаемый статус из словаря, либо выводим сырой, если прилетит неизвестный
+    const statusLabel = COMMISSION_PROGRESS_LABELS[progress] || progress;
 
     return (
         <div className={`bg-white border ${isPosted ? "border-slate-200 hover:border-slate-300 hover:shadow-md" : "border-slate-100 opacity-80"} rounded-xl p-5 shadow-sm transition-all flex flex-col justify-between min-h-[180px]`}>
@@ -31,12 +58,9 @@ export function CommissionCard({ commission, viewerRole }: CommissionCardProps) 
                         {commission.commissionType.replace(/_/g, " ")}
                     </span>
 
-                    <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${
-                        isPosted ? "bg-emerald-50 text-emerald-700 border-emerald-100" :
-                            isCompleted ? "bg-slate-100 text-slate-500 border-slate-200" :
-                                "bg-amber-50 text-amber-700 border-amber-100"
-                    }`}>
-                        {isPosted ? "Ищет исполнителя" : isCompleted ? "Завершен" : "В работе"}
+                    {/* Динамический бэйдж со статусом из словаря */}
+                    <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${getStatusStyles(progress)}`}>
+                        {statusLabel}
                     </span>
                 </div>
 

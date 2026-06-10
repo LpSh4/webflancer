@@ -32,8 +32,28 @@ interface FullUserProfile {
 
 export async function loader({ request }: Route.LoaderArgs) {
     const { user } = await getUser(request);
+    const cookieHeader = request.headers.get("Cookie");
+    const headers = cookieHeader ? { Cookie: cookieHeader } : undefined;
+
     const links = (user as any).portfolioLinks || [];
-    return { user: user as FullUserProfile, initialLinks: links };
+    let completedCount = 0;
+
+    try {
+        // 🔥 Запрашиваем список всех заказов этого пользователя
+        const commissionsRes = await api.get(`/commissions/user/${user.id}`, { headers });
+        const commissions = commissionsRes.data || [];
+
+        // Фильтруем только завершенные сделки
+        completedCount = commissions.filter((c: any) => c.commissionProgress === "COMPLETED").length;
+    } catch (error) {
+        console.warn("[Profile Loader] Не удалось загрузить сделки пользователя:", error);
+    }
+
+    return {
+        user: user as FullUserProfile,
+        initialLinks: links,
+        completedCount // 🔥 Отправляем на фронтенд
+    };
 }
 
 export async function action({ request }: Route.ActionArgs) {
@@ -43,28 +63,25 @@ export async function action({ request }: Route.ActionArgs) {
     const intent = formData.get("intent");
 
     try {
-        // 🔥 ФИЧА 1: Обновление аватарки через отдельный эндпоинт бэкенда
         if (intent === "update_avatar") {
             const profilePicture = formData.get("profilePicture") as string;
             await api.patch('/users/avatar', { profilePicture }, { headers });
             return { success: true, message: "Аватар успешно обновлен!" };
         }
 
-        // 🔥 ФИЧА 2: Обновление email через отдельный эндпоинт бэкенда
         if (intent === "update_email") {
             const email = formData.get("email") as string;
             await api.patch('/users/email', { email }, { headers });
             return { success: true, message: "Email успешно изменен!" };
         }
 
-        // Базовое обновление профиля
         const updateData: Record<string, any> = {
             name: formData.get("name") as string,
             surname: formData.get("surname") as string,
             displayedName: formData.get("displayedName") as string,
             phoneNumber: formData.get("phoneNumber") as string,
             login: formData.get("login") as string,
-            profileStatus: formData.get("profileStatus") as string, // Наш скрытый статус!
+            profileStatus: formData.get("profileStatus") as string,
         };
 
         const role = formData.get("role") as string;
@@ -92,7 +109,7 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function ProfilePage() {
-    const { user, initialLinks } = useLoaderData<typeof loader>();
+    const { user, initialLinks, completedCount } = useLoaderData<typeof loader>();
     const actionData = useActionData<typeof action>();
     const navigation = useNavigation();
     const isSubmitting = navigation.state === "submitting";
@@ -100,7 +117,6 @@ export default function ProfilePage() {
     const [links, setLinks] = useState<string[]>(initialLinks);
     const [newLink, setNewLink] = useState("");
 
-    // Синхронизируем ссылки при перезагрузке данных лоадером
     useEffect(() => {
         setLinks(initialLinks);
     }, [initialLinks]);
@@ -140,7 +156,8 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                     {/* Левый сайдбар */}
                     <div className="space-y-6">
-                        <ProfileInfoCard user={user as any} />
+                        {/* 🔥 Передаем реальный счетчик завершенных сделок */}
+                        <ProfileInfoCard user={user as any} completedCount={completedCount} />
 
                         {/* Форма быстрой смены аватарки */}
                         <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
@@ -179,7 +196,6 @@ export default function ProfilePage() {
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <Input label="Номер телефона" name="phoneNumber" defaultValue={user.phoneNumber} required placeholder="89001234567" />
-                                    {/* 🔥 ИНПУТ СТАТУСА: Теперь его можно менять на фронте! */}
                                     <Input label="Статус профиля" name="profileStatus" defaultValue={user.profileStatus || ""} placeholder="Например: В поисках сложных задач" />
                                 </div>
 
@@ -217,7 +233,6 @@ export default function ProfilePage() {
                             </Form>
                         </div>
 
-                        {/* 🔥 Отдельный защищенный блок смены Email */}
                         <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
                             <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider pb-3 border-b border-slate-100 mb-4 flex items-center gap-2">
                                 <Mail className="w-4 h-4 text-slate-400" /> Безопасность аккаунта
@@ -233,7 +248,6 @@ export default function ProfilePage() {
                             </Form>
                         </div>
 
-                        {/* Управление ссылками портфолио */}
                         {user.role === "DEVELOPER" && (
                             <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm space-y-4">
                                 <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider pb-3 border-b border-slate-100">

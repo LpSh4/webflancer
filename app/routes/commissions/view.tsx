@@ -3,8 +3,9 @@ import type { Route } from "./+types/view";
 import { useState } from "react";
 import { getUser } from "~/shared/utils/auth.server";
 import { api } from "~/shared/utils/api.server";
-import { ArrowLeft, Clock, Send, CheckCircle2, MessageSquare, Star } from "lucide-react";
+import {ArrowLeft, Clock, Send, CheckCircle2, MessageSquare, Star, ShieldAlert} from "lucide-react";
 import { Input } from "~/shared/ui/Input";
+import { Info } from "lucide-react"; // Красивые иконки для предупреждений
 import { Button } from "~/shared/ui/Button";
 import { Modal } from "~/shared/ui/Modal";
 
@@ -51,6 +52,12 @@ export async function action({ request, params }: Route.ActionArgs) {
 
     if (intent === "accept_bid") {
         try {
+            const cookieHeader = request.headers.get("Cookie") || "";
+            const headers = {
+                Cookie: cookieHeader,
+            };
+            console.log(cookieHeader)
+            console.log(headers)
             await api.post(`/bids/accept/${formData.get("bidId")}`, {}, { headers });
             return { success: true, message: "Исполнитель выбран! Заказ переведён в работу." };
         } catch (error: any) {
@@ -120,6 +127,7 @@ export default function CommissionViewPage() {
     const acceptedBid = bids.find((b: any) => b.bidStatus === "accepted");
     const canAccessWorkspace = isMyCommission || (acceptedBid && acceptedBid.developerId === user.id);
 
+    const [isAgreed, setIsAgreed] = useState(false);
     // Может ли юзер оставить отзыв
     const isParticipant = isMyCommission || (commission.developerId === user.id);
     const alreadyReviewed = user.role === "CLIENT"
@@ -436,22 +444,53 @@ export default function CommissionViewPage() {
                 </div>
 
                 {/* Модалка отклика */}
-                <Modal isOpen={isBidModalOpen} onClose={() => setIsBidModalOpen(false)} title="Откликнуться на заказ">
-                    <Form method="post" className="space-y-4" onSubmit={() => setTimeout(() => setIsBidModalOpen(false), 300)}>
+                <Modal isOpen={isBidModalOpen} onClose={() => { setIsBidModalOpen(false); setIsAgreed(false); }} title="Откликнуться на заказ">
+                    <Form method="post" className="space-y-4" onSubmit={() => setTimeout(() => { setIsBidModalOpen(false); setIsAgreed(false); }, 300)}>
                         <input type="hidden" name="intent" value="create_bid" />
-                        <div>
-                            <label className="text-xs font-medium text-slate-700 mb-1.5 ml-0.5 block">Сопроводительное письмо</label>
-                            <textarea
-                                name="comment"
-                                rows={5}
-                                required
-                                placeholder="Опишите ваш опыт и почему вы подходите для этой задачи..."
-                                className="w-full bg-white border border-slate-200 px-3 py-2 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5 transition-all resize-none"
-                            />
+
+                        {/* Передаем скрытый комментарий бэкенду, чтобы не ломать валидацию */}
+                        <input type="hidden" name="comment" value="Отклик без сопроводительного письма. Условия платформы приняты." />
+
+                        {/* Блок соглашения */}
+                        <div className="bg-amber-50/60 border border-amber-200/80 rounded-xl p-4 text-slate-700 space-y-3">
+                            <div className="flex items-center gap-2 text-amber-800 font-bold text-xs uppercase tracking-wider">
+                                <ShieldAlert className="w-4 h-4 shrink-0 text-amber-600" />
+                                Внимание: Платформа прямого расчета
+                            </div>
+
+                            <div className="text-xs text-slate-600 leading-relaxed space-y-2">
+                                <p>
+                                    Наша платформа выступает <strong>исключительно в роли доски объявлений</strong> и связующего звена. Мы не являемся гарантом сделки и не удерживаем средства пользователей.
+                                </p>
+                                <p>
+                                    Вам придётся <strong>самостоятельно договариваться</strong> о том, как, когда и в какой валюте заказчик будет выплачивать вам гонорар (криптовалюта, банковские переводы, электронные кошельки и т. д.).
+                                </p>
+                                <p className="flex gap-1.5 text-slate-500 bg-white/60 border border-slate-100 p-2 rounded-md mt-1">
+                                    <Info className="w-3.5 h-3.5 shrink-0 text-blue-500 mt-0.5" />
+                                    Настоятельно рекомендуем брать предоплату, разбивать крупные задачи на мелкие этапы и не передавать финальные исходные коды до полного расчета.
+                                </p>
+                            </div>
                         </div>
-                        <div className="flex justify-end gap-3 pt-2">
-                            <Button type="button" variant="ghost" onClick={() => setIsBidModalOpen(false)}>Отмена</Button>
-                            <Button type="submit" disabled={isSubmitting}>
+
+                        {/* Чекбокс подтверждения */}
+                        <label className="flex items-start gap-3 p-2 rounded-lg hover:bg-slate-50 cursor-pointer select-none transition-colors">
+                            <input
+                                type="checkbox"
+                                checked={isAgreed}
+                                onChange={(e) => setIsAgreed(e.target.checked)}
+                                className="mt-0.5 w-4 h-4 rounded text-slate-900 border-slate-300 focus:ring-slate-900 focus:ring-offset-0 accent-slate-950"
+                            />
+                            <span className="text-xs text-slate-600 font-medium leading-tight">
+                Я понимаю все риски, беру ответственность за финансовые расчеты на себя и хочу отправить отклик.
+            </span>
+                        </label>
+
+                        <div className="flex justify-end gap-3 pt-2 border-t border-slate-100">
+                            <Button type="button" variant="ghost" onClick={() => { setIsBidModalOpen(false); setIsAgreed(false); }}>
+                                Отмена
+                            </Button>
+                            {/* Кнопка активна только если проставлен чекбокс согласия */}
+                            <Button type="submit" disabled={isSubmitting || !isAgreed}>
                                 {isSubmitting ? "Отправка..." : "Отправить отклик"}
                             </Button>
                         </div>

@@ -192,7 +192,7 @@ export default function ChatPage() {
                 <div className="text-center space-y-2 py-4 bg-amber-50 border border-amber-100 rounded-xl">
                     <Loader2 className="w-5 h-5 text-amber-500 animate-spin mx-auto" />
                     <p className="text-[11px] font-bold text-amber-800">На проверке</p>
-                    <p className="text-[10px] text-amber-600 px-3">Этап «{proposedStageName}» у заказчика</p>
+                    <p className="text-[10px] text-amber-600 px-3">Заказчик подтверждает переход на «{proposedStageName}»</p>
                 </div>
             );
         }
@@ -208,7 +208,7 @@ export default function ChatPage() {
                         className="w-full flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-bold bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50"
                     >
                         <CheckCircle2 className="w-3.5 h-3.5" />
-                        {isSubmitting ? "Отправка..." : `Сдать: ${nextStage.label}`}
+                        {isSubmitting ? "Отправка..." : `Перейти к: ${nextStage.label}`}
                     </button>
                 </Form>
             );
@@ -230,13 +230,13 @@ export default function ChatPage() {
         }
 
         // 🔥 КНОПКА ФИНАЛЬНОГО ЗАВЕРШЕНИЯ ПРОЕКТА ДЛЯ ЗАКАЗЧИКА 🔥
-        if (isFinished && !activeProposal) {
+        if ((isFinished || currentStage.percent >=30) && !activeProposal) {
             return (
                 <div className="text-center py-5 bg-blue-50 border border-blue-100 rounded-xl">
                     <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
                         <CheckCircle2 className="w-5 h-5 text-blue-600" />
                     </div>
-                    <p className="text-xs font-bold text-blue-800 mb-3">Все этапы пройдены!</p>
+                    <p className="text-xs font-bold text-blue-800 mb-3"> {isFinished ? "Все этапы пройдены!" : "Пропустить выполнение этапов:"}</p>
                     <Form method="post" className="px-3">
                         <input type="hidden" name="intent" value="complete_commission" />
                         <button
@@ -255,7 +255,7 @@ export default function ChatPage() {
             return (
                 <div className="space-y-3">
                     <div className="bg-white p-3 rounded-lg border border-slate-200 text-center shadow-sm">
-                        <p className="text-[10px] text-slate-500 mb-1">Разработчик сдал этап:</p>
+                        <p className="text-[10px] text-slate-500 mb-1">Разработчик хочет перейти на этап:</p>
                         <p className="text-xs font-bold text-blue-600">«{proposedStageName}»</p>
                     </div>
                     <Form method="post">
@@ -315,7 +315,7 @@ export default function ChatPage() {
                                 <div className="flex items-center gap-3 mt-1">
                                     <p className="text-[10px] flex items-center gap-1.5">
                                         <span className={`w-1.5 h-1.5 rounded-full ${isSocketConnected ? 'bg-emerald-500' : 'bg-red-400'}`} />
-                                        <span className="text-slate-400">{isSocketConnected ? 'Чат активен' : 'Нет соединения'}</span>
+                                        <span className="text-slate-400">{isSocketConnected ? 'Чат активен' : 'Пользователь оффлайн'}</span>
                                     </p>
                                     <span className="text-slate-300">|</span>
                                     <p className="text-[10px] text-slate-500 flex items-center gap-1">

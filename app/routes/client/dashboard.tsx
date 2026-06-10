@@ -7,7 +7,7 @@ import { FolderKanban, CheckCircle2, LayoutGrid, ArrowRight, PlusCircle } from "
 import { Button } from "~/shared/ui/Button";
 import { CreateCommissionModal } from "~/features/commission/ui/CreateCommissionModal";
 import { createCommissionSchema } from "~/features/commission/commission.schema";
-
+import { COMMISSION_PROGRESS_LABELS } from "~/features/commission/commission.constants";
 interface Commission {
     id: string;
     title: string;
@@ -18,17 +18,25 @@ interface Commission {
 }
 
 // 🔥 Красивый маппинг статусов на русский язык с цветами
-const STATUS_UI: Record<string, { label: string; color: string }> = {
-    POSTED: { label: "Поиск исполнителя", color: "bg-blue-50 text-blue-700 border-blue-200" },
-    IN_PROGRESS: { label: "В работе", color: "bg-amber-50 text-amber-700 border-amber-200" },
-    DEVELOPMENT: { label: "В разработке", color: "bg-amber-50 text-amber-700 border-amber-200" },
-    TESTING: { label: "Тестирование", color: "bg-purple-50 text-purple-700 border-purple-200" },
-    DEVELOPMENT_COMPLETE: { label: "На проверке", color: "bg-indigo-50 text-indigo-700 border-indigo-200" },
-    COMPLETED: { label: "Завершен", color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
-    ARCHIVED: { label: "В архиве", color: "bg-slate-100 text-slate-600 border-slate-200" },
-    CANCELLED: { label: "Отменен", color: "bg-red-50 text-red-700 border-red-200" },
-    DISPUTED: { label: "Спор", color: "bg-orange-50 text-orange-700 border-orange-200" },
-    REFUNDED: { label: "Возврат", color: "bg-red-50 text-red-700 border-red-200" },
+const getStatusStyles = (status: string) => {
+    switch (status) {
+        case "POSTED":
+            return "bg-blue-50 text-blue-700 border-blue-200";
+        case "CONTRACT_STARTED":
+        case "DEVELOPMENT":
+        case "TESTING":
+            return "bg-amber-50 text-amber-700 border-amber-200";
+        case "DEV_COMPLETE":
+            return "bg-indigo-50 text-indigo-700 border-indigo-200";
+        case "COMPLETED":
+            return "bg-emerald-50 text-emerald-700 border-emerald-200";
+        case "CANCELLED":
+        case "DISPUTED":
+        case "REFUNDED":
+            return "bg-red-50 text-red-700 border-red-200";
+        default:
+            return "bg-slate-100 text-slate-600 border-slate-200";
+    }
 };
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -187,11 +195,8 @@ export default function ClientDashboard() {
                             </tr>
                         ) : (
                             commissions.map((c) => {
-                                // Достаем красивый статус и цвет (если вдруг статус незнакомый, применяем дефолтный серый)
-                                const statusInfo = STATUS_UI[c.commissionProgress] || {
-                                    label: c.commissionProgress,
-                                    color: "bg-slate-100 text-slate-600 border-slate-200"
-                                };
+                                const statusLabel = COMMISSION_PROGRESS_LABELS[c.commissionProgress] || c.commissionProgress;
+                                const statusColor = getStatusStyles(c.commissionProgress);
 
                                 return (
                                     <tr key={c.id} className="hover:bg-slate-50/50 transition-colors">
@@ -201,10 +206,9 @@ export default function ClientDashboard() {
                                             </Link>
                                         </td>
                                         <td className="p-4">
-                                            {/* Применяем динамические классы */}
-                                            <span className={`px-2.5 py-1 rounded-md font-bold uppercase text-[9px] tracking-wider border ${statusInfo.color}`}>
-                                                    {statusInfo.label}
-                                                </span>
+                                             <span className={`px-2.5 py-1 rounded-md font-bold uppercase text-[9px] tracking-wider border ${statusColor}`}>
+                                                 {statusLabel}
+                                             </span>
                                         </td>
                                         <td className="p-4 font-semibold text-slate-700">
                                             {c.budgetMin} $

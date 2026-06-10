@@ -1,4 +1,4 @@
-import {useState} from "react";
+import { useState, useEffect } from "react";
 
 export function getUserColor(name: string) {
     if (!name) return "#3b82f6";
@@ -19,6 +19,8 @@ interface UserAvatarProps {
 
 export function UserAvatar({name, src, size = 40, className = "", lastOnline, showStatus = false}: UserAvatarProps) {
     const [isError, setIsError] = useState(false);
+    const [finalUrl, setFinalUrl] = useState<string>("");
+
     const initial = name?.trim().charAt(0).toUpperCase() || "?";
     const bgColor = getUserColor(name);
 
@@ -26,9 +28,9 @@ export function UserAvatar({name, src, size = 40, className = "", lastOnline, sh
         ? (Date.now() - new Date(lastOnline).getTime() < 1000 * 60 * 4)
         : false;
 
+    // Формируем корректную ссылку
     const getFileUrl = () => {
         if (!src) return "";
-        // Если это blob, base64 или фулл ссылка — отдаем как есть
         if (src.startsWith('http') || src.startsWith('blob:') || src.startsWith('data:')) {
             return src;
         }
@@ -36,20 +38,46 @@ export function UserAvatar({name, src, size = 40, className = "", lastOnline, sh
         return `${apiUrl}${src}`;
     };
 
-    const fileUrl = getFileUrl();
+    // 🔥 ФИЧА: Валидация размеров картинки на клиенте
+    useEffect(() => {
+        const fileUrl = getFileUrl();
+        if (!fileUrl) {
+            setFinalUrl("");
+            setIsError(false);
+            return;
+        }
+
+        const img = new Image();
+        img.src = fileUrl;
+
+        img.onload = () => {
+            // Если картинка больше 1000x1000, подменяем её на серую затычку-плейсхолдер
+            if (img.width > 1000 || img.height > 1000) {
+                console.warn(`[UserAvatar] Картинка ${img.width}x${img.height} превышает лимит 1000px. Ставим заглушку.`);
+                setFinalUrl("https://png.pngtree.com/png-vector/20250512/ourmid/pngtree-default-avatar-profile-icon-gray-placeholder-vector-png-image_16213764.png");
+            } else {
+                setFinalUrl(fileUrl);
+            }
+            setIsError(false);
+        };
+
+        img.onerror = () => {
+            setIsError(true);
+        };
+    }, [src]);
 
     return (
         <div className={`relative shrink-0 ${className}`} style={{width: size, height: size}}>
             <div
-                className="w-full h-full flex items-center justify-center rounded-full overflow-hidden select-none font-bold text-white shadow-inner"
+                className="w-full h-full flex items-center justify-center rounded-full overflow-hidden select-none font-bold text-white shadow-inner border border-slate-200/60"
                 style={{
                     backgroundColor: isError || !src ? bgColor : "transparent",
-                    fontSize: `${size * 0.4}px`,
+                    fontSize: `${size * 0.38}px`,
                 }}
             >
-                {src && !isError ? (
+                {src && finalUrl && !isError ? (
                     <img
-                        src={fileUrl}
+                        src={finalUrl}
                         alt={name}
                         loading="lazy"
                         decoding="async"
@@ -57,20 +85,20 @@ export function UserAvatar({name, src, size = 40, className = "", lastOnline, sh
                         onError={() => setIsError(true)}
                     />
                 ) : (
-                    <span className="uppercase tracking-wider">{initial}</span>
+                    <span className="uppercase tracking-wider font-black">{initial}</span>
                 )}
             </div>
 
             {showStatus && (
                 <div
-                    className={`absolute bottom-0 right-0 rounded-full border-2 border-[#0f172a] transition-all duration-500 ${
+                    className={`absolute bottom-0 right-0 rounded-full border-2 border-white transition-all duration-500 ${
                         isOnline
                             ? "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]"
-                            : "bg-slate-600"
+                            : "bg-slate-400"
                     }`}
                     style={{
-                        width: `${Math.max(size * 0.28, 8)}px`,
-                        height: `${Math.max(size * 0.28, 8)}px`,
+                        width: `${Math.max(size * 0.26, 9)}px`,
+                        height: `${Math.max(size * 0.26, 9)}px`,
                     }}
                     title={isOnline ? "В сети" : "Офлайн"}
                 />

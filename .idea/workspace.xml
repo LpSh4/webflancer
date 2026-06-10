@@ -2,19 +2,24 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="718a5c52-989d-4b0d-97d4-dbb42cb68aca" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/app/features/commission/commission.constants.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/root.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/root.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/commission/ui/CommissionCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/features/commission/ui/CommissionCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/features/user/ui/ProfileInfoCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/features/user/ui/ProfileInfoCard.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routes/chat/chat.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/chat/chat.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routes/client/dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/client/dashboard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routes/commissions/feed.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/commissions/feed.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routes/commissions/view.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/commissions/view.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routes/developer/dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/developer/dashboard.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routes/users/profile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/users/profile.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routes/users/view.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/users/view.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/shared/ui/Navbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/shared/ui/Navbar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/shared/utils/api.client.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/shared/utils/api.client.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/shared/utils/socket.client.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/shared/utils/socket.client.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/shared/ui/UserAvatar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/shared/ui/UserAvatar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/_metadata.json" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/_metadata.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.vite/deps/react-router_dom.js" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.vite/deps/react-router_dom.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/vite.config.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -32,6 +37,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 2,
@@ -42,22 +48,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;frontend-dev&quot;,
-    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/whyniero/michiel/frontend&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/home/whyniero/michiel/frontend/node_modules/typescript/lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "frontend-dev",
+    "javascript.preferred.runtime.type.id": "node",
+    "last_opened_file_path": "/home/whyniero/michiel/frontend",
+    "nodejs_package_manager_path": "npm",
+    "ts.external.directory.path": "/home/lpsh/WebstormProjects/webflancer_frontend-dev/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/app/features/user/shared" />
@@ -84,14 +90,22 @@
       <workItem from="1779446213652" duration="9265000" />
       <workItem from="1779461090320" duration="669000" />
       <workItem from="1779534289409" duration="4000" />
-      <workItem from="1779534304717" duration="5508000" />
-      <workItem from="1779990476894" duration="37000" />
-      <workItem from="1781040461781" duration="2865000" />
-      <workItem from="1781043483596" duration="12819000" />
+      <workItem from="1779534304717" duration="5370000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

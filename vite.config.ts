@@ -11,12 +11,12 @@ export default defineConfig({
     server: {
         proxy: {
             '/api': {
-                target: 'http://localhost:3000',
+                target: 'https://backend.ryban.ru',
                 changeOrigin: true,
                 secure: false,
             },
             '/api/v1/socket.io': {
-                target: 'http://localhost:3000',
+                target: 'https://backend.ryban.ru',
                 changeOrigin: true,
                 secure: false,
                 ws: true,

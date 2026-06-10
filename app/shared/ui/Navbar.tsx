@@ -2,6 +2,7 @@ import { Link, Form, useLocation, useNavigate } from "react-router";
 import { useState, useEffect, useRef } from "react";
 import { Logo } from "~/shared/ui/Logo";
 import type { UserProfile } from "~/features/user/shared/model";
+import { UserAvatar } from "~/shared/ui/UserAvatar"; // 🔥 Подключаем наш прокачанный аватар
 import {
     Bell, LogOut, User as UserIcon, Star,
     Briefcase, Send, CheckCircle2, AlertCircle, CheckCheck
@@ -61,7 +62,6 @@ export function Navbar({ user }: NavbarProps) {
 
         const handleNewNotification = (notification: AppNotification) => {
             console.log("🔔 ПРИШЛО УВЕДОМЛЕНИЕ:", notification);
-            // Добавляем новое уведомление в начало списка
             setNotifications(prev => [notification, ...prev]);
         };
 
@@ -153,9 +153,15 @@ export function Navbar({ user }: NavbarProps) {
                                         <div className="text-[11px] font-semibold text-slate-800 leading-none">{user.name}</div>
                                         <div className="text-[9px] text-slate-400 font-medium mt-0.5 uppercase tracking-wider">{user.role === "DEVELOPER" ? "Фрилансер" : "Заказчик"}</div>
                                     </div>
-                                    <div className="w-8 h-8 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center font-bold text-xs text-slate-700">
-                                        {user.name ? user.name.charAt(0).toUpperCase() : "U"}
-                                    </div>
+
+                                    {/* 🔥 Внедряем наш умный аватар вместо старого div */}
+                                    <UserAvatar
+                                        name={user.name}
+                                        src={(user as any).profilePicture} // Приведение к any на случай, если поле временно отсутствует в типах UserProfile
+                                        lastOnline={(user as any).lastOnline}
+                                        showStatus={true}
+                                        size={32}
+                                    />
                                 </button>
 
                                 {isProfileOpen && (
