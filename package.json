@@ -1,8 +1,9 @@
 {
   "type": "commonjs",
   "scripts": {
-    "dev": "node --watch dist/server.js",
-    "build": "tsc -p ./tsconfig.json --watch",
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
     "migration:create": "ts-node node_modules/typeorm/cli.js migration:generate src/migrations/AutoMigration -d src/datasource.ts",
     "migration:create:prod": "npx typeorm migration:generate src/migrations/AutoMigration -d dist/datasource.js",
     "migration:up": "ts-node node_modules/typeorm/cli.js migration:run -d src/datasource.ts",

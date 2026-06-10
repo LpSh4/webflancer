@@ -4,28 +4,27 @@ import {
   CreateNotificationInput,
 } from "./notification.repository";
 import { Notification } from "../../entities/notification.entity";
+import { WsService } from "../socket/ws.service"; // <-- ИМПОРТ
 
 export class NotificationService {
   constructor(
-    private em: EntityManager,
-    private notificationRepo: NotificationRepository,
+      private em: EntityManager,
+      private notificationRepo: NotificationRepository,
+      private wsService: WsService // <-- ИНЖЕКТИМ СЕРВИС
   ) {}
 
   async createNotification(
-    data: CreateNotificationInput,
-    em?: EntityManager,
+      data: CreateNotificationInput,
+      em?: EntityManager,
   ): Promise<Notification> {
     const manager = em ?? this.em;
 
-    // Always persist inside the active database transaction context
     const notification = await this.notificationRepo.createNotification(
-      data,
-      manager,
+        data,
+        manager,
     );
 
-    // 🚀 FUTURE WEBSOCKET HOOK:
-    // When ready, you will inject your WsService / Socket Server instance here:
-    // this.wsService.emitToUser(data.recipientId, "notification", notification);
+    this.wsService.emitToUser(data.recipientId, "new_notification", notification);
 
     return notification;
   }

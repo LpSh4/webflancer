@@ -7,6 +7,7 @@ import { BidController } from "../modules/bid/bid.controller";
 import { ProposalController } from "../modules/proposal/proposal.controller";
 import { ReviewController } from "../modules/review/review.controller";
 import { NotificationController } from "../modules/notification/notification.controller";
+import {ChatController} from "../modules/chat/chat.controller";
 declare module "@fastify/awilix" {
   interface Cradle {
     authController: AuthController;
@@ -18,5 +19,6 @@ declare module "@fastify/awilix" {
     proposalController: ProposalController;
     reviewController: ReviewController;
     notificationController: NotificationController;
+    chatController: ChatController;
   }
 }
