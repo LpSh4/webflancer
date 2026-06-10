@@ -12,6 +12,7 @@ export const registerSchema = {
       email: { type: "string", format: "email" },
       phoneNumber: { type: "string", pattern: "^89\\d{9}$" },
       name: { type: "string" },
+      surname: { type: "string" },
     },
   },
 };

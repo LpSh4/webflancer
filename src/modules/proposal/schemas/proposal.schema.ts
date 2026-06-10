@@ -7,13 +7,19 @@ export const CreateProposalSchema = {
   body: {
     type: "object",
     properties: {
-      id: { type: "string", format: "uuid" },
       workStatus: {
         type: "string",
         enum: Object.values(CommissionWorkStatus),
       },
     },
-    required: ["workStatus", "id"],
+    required: ["workStatus"],
+  },
+  params: {
+    type: "object",
+    properties: {
+      id: { type: "string", format: "uuid" },
+    },
+    required: ["id"],
   },
 };
 

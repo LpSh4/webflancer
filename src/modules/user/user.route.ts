@@ -62,10 +62,10 @@ export async function userRoutes(fastify: FastifyInstance) {
 
   fastify.get<{
     Params: {
-      id: string;
+      targetId: string;
     };
   }>(
-    "/:id",
+    "/:targetId",
     { preHandler: [authenticate], schema: getByIdSchema },
     async (req, res): Promise<User> => {
       return resolve(req).getUser(req, res);
