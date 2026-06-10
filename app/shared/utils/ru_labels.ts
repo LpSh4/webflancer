@@ -1,0 +1,1 @@
+export const roleMap: Record<string, string> = {intern: 'Стажер', teamlead: 'Тимлид', hr: 'HR'};
