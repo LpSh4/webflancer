@@ -1,8 +1,12 @@
-import {useLoaderData, Link} from "react-router";
-import type {Route} from "./+types/dashboard";
-import {getUser} from "~/shared/utils/auth.server";
-import {api} from "~/shared/utils/api.server";
-import {FolderKanban, CheckCircle2, LayoutGrid, ArrowRight} from "lucide-react";
+import { useLoaderData, useActionData, Link } from "react-router";
+import { useState, useEffect } from "react";
+import type { Route } from "./+types/dashboard";
+import { getUser } from "~/shared/utils/auth.server";
+import { api } from "~/shared/utils/api.server";
+import { FolderKanban, CheckCircle2, LayoutGrid, ArrowRight, PlusCircle } from "lucide-react";
+import { Button } from "~/shared/ui/Button";
+import { CreateCommissionModal } from "~/features/commission/ui/CreateCommissionModal";
+import { createCommissionSchema } from "~/features/commission/commission.schema";
 
 interface Commission {
     id: string;
@@ -13,25 +17,38 @@ interface Commission {
     createdAt: string;
 }
 
-export async function loader({request}: Route.LoaderArgs) {
-    const {user} = await getUser(request);
+// 🔥 Красивый маппинг статусов на русский язык с цветами
+const STATUS_UI: Record<string, { label: string; color: string }> = {
+    POSTED: { label: "Поиск исполнителя", color: "bg-blue-50 text-blue-700 border-blue-200" },
+    IN_PROGRESS: { label: "В работе", color: "bg-amber-50 text-amber-700 border-amber-200" },
+    DEVELOPMENT: { label: "В разработке", color: "bg-amber-50 text-amber-700 border-amber-200" },
+    TESTING: { label: "Тестирование", color: "bg-purple-50 text-purple-700 border-purple-200" },
+    DEVELOPMENT_COMPLETE: { label: "На проверке", color: "bg-indigo-50 text-indigo-700 border-indigo-200" },
+    COMPLETED: { label: "Завершен", color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+    ARCHIVED: { label: "В архиве", color: "bg-slate-100 text-slate-600 border-slate-200" },
+    CANCELLED: { label: "Отменен", color: "bg-red-50 text-red-700 border-red-200" },
+    DISPUTED: { label: "Спор", color: "bg-orange-50 text-orange-700 border-orange-200" },
+    REFUNDED: { label: "Возврат", color: "bg-red-50 text-red-700 border-red-200" },
+};
+
+export async function loader({ request }: Route.LoaderArgs) {
+    const { user } = await getUser(request);
     const cookieHeader = request.headers.get("Cookie");
 
     let commissions: Commission[] = [];
 
     try {
         const response = await api.get(`/commissions/user/${user.id}`, {
-            headers: {Cookie: cookieHeader}
+            headers: { Cookie: cookieHeader }
         });
         commissions = response.data;
     } catch (error) {
         console.error("[Client Dashboard Loader] Ошибка:", error);
     }
 
-    // Считаем реальную статистику по проектам клиента
     const totalCount = commissions.length;
     const postedCount = commissions.filter(c => c.commissionProgress === "POSTED").length;
-    const completedCount = commissions.filter(c => c.commissionProgress === "DEVELOPMENT_COMPLETE").length;
+    const completedCount = commissions.filter(c => c.commissionProgress === "COMPLETED").length;
 
     return {
         user,
@@ -44,64 +61,113 @@ export async function loader({request}: Route.LoaderArgs) {
     };
 }
 
+export async function action({ request }: Route.ActionArgs) {
+    const formData = await request.formData();
+    const data = Object.fromEntries(formData);
+    const cookieHeader = request.headers.get("Cookie");
+
+    const result = createCommissionSchema.safeParse(data);
+
+    if (!result.success) {
+        return {
+            success: false,
+            fieldErrors: result.error.flatten().fieldErrors,
+            error: null,
+        };
+    }
+
+    const payload = {
+        type: result.data.type,
+        title: result.data.title,
+        description: result.data.description || "",
+        functionality: result.data.functionality || "",
+        designLink: result.data.designLink || "",
+        budgetMin: result.data.budgetMin,
+        budgetMax: result.data.budgetMax || null,
+        deadLine: result.data.deadLine ? new Date(result.data.deadLine).toISOString() : null,
+        references: [] as string[]
+    };
+
+    try {
+        await api.post('/commissions/create', payload, {
+            headers: { Cookie: cookieHeader }
+        });
+        return { success: true, fieldErrors: null, error: null };
+    } catch (error: any) {
+        console.error("[Dashboard Action] Ошибка создания заказа:", error.message);
+        return {
+            success: false,
+            fieldErrors: null,
+            error: error.response?.data?.message || "Бэкенд недоступен или вернул ошибку"
+        };
+    }
+}
+
 export default function ClientDashboard() {
-    const {user, commissions, stats} = useLoaderData<typeof loader>();
+    const { user, commissions, stats } = useLoaderData<typeof loader>();
+    const actionData = useActionData<typeof action>();
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    useEffect(() => {
+        if (actionData?.success) {
+            setIsModalOpen(false);
+        }
+    }, [actionData]);
 
     return (
         <div className="p-6 bg-slate-50 min-h-screen">
             <div className="max-w-5xl mx-auto">
 
-                <div className="mb-6 flex justify-between items-end">
+                <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900">Панель управления заказами</h1>
                         <p className="text-xs text-slate-500 mt-1">Добро пожаловать, <span
                             className="font-semibold text-slate-700">{user.displayedName}</span></p>
                     </div>
-                    <Link to="/commissions"
-                          className="bg-slate-900 text-white text-xs px-4 py-2 rounded-lg font-semibold hover:bg-slate-800 transition-colors shadow-sm">
-                        + Создать заказ
-                    </Link>
+                    <Button onClick={() => setIsModalOpen(true)} className="gap-2 shadow-sm">
+                        <PlusCircle className="w-4 h-4" /> Создать заказ
+                    </Button>
                 </div>
 
-                {/* Реальная статистика по массиву из базы */}
+                {actionData?.success && (
+                    <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-sm font-medium flex items-center gap-2 mb-6 shadow-sm">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600" /> Заказ успешно опубликован!
+                    </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
                         <div className="p-3 bg-slate-100 text-slate-700 rounded-lg">
-                            <LayoutGrid className="w-5 h-5"/>
+                            <LayoutGrid className="w-5 h-5" />
                         </div>
                         <div>
-                            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Всего
-                                проектов
-                            </div>
+                            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Всего проектов</div>
                             <div className="text-2xl font-black text-slate-900 mt-0.5">{stats.total}</div>
                         </div>
                     </div>
 
                     <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
                         <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
-                            <FolderKanban className="w-5 h-5"/>
+                            <FolderKanban className="w-5 h-5" />
                         </div>
                         <div>
-                            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Открыто /
-                                Ищут
-                            </div>
+                            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Открыто / Ищут</div>
                             <div className="text-2xl font-black text-slate-900 mt-0.5">{stats.posted}</div>
                         </div>
                     </div>
 
                     <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
                         <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
-                            <CheckCircle2 className="w-5 h-5"/>
+                            <CheckCircle2 className="w-5 h-5" />
                         </div>
                         <div>
-                            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Завершено
-                            </div>
+                            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Завершено</div>
                             <div className="text-2xl font-black text-slate-900 mt-0.5">{stats.completed}</div>
                         </div>
                     </div>
                 </div>
 
-                {/* Таблица текущих заказов */}
                 <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
                     <table className="w-full text-xs text-left">
                         <thead className="bg-slate-50 border-b border-slate-200">
@@ -120,35 +186,49 @@ export default function ClientDashboard() {
                                 </td>
                             </tr>
                         ) : (
-                            commissions.map((c) => (
-                                <tr key={c.id} className="hover:bg-slate-50/50 transition-colors">
-                                    <td className="p-4 font-bold text-slate-900">
-                                        <Link to={`/commissions/${c.id}`}
-                                              className="hover:text-blue-600 hover:underline">
-                                            {c.title}
-                                        </Link>
-                                    </td>
-                                    <td className="p-4">
-                                        <span
-                                            className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-bold uppercase text-[9px] border border-blue-100">
-                                            {c.commissionProgress}
-                                        </span>
-                                    </td>
-                                    <td className="p-4 font-semibold text-slate-700">{c.budgetMin} $</td>
-                                    <td className="p-4 text-right">
-                                        <Link
-                                            to={`/commissions/${c.id}`}
-                                            className="inline-flex items-center gap-1 text-slate-900 font-bold hover:underline"
-                                        >
-                                            Управление <ArrowRight className="w-3 h-3"/>
-                                        </Link>
-                                    </td>
-                                </tr>
-                            ))
+                            commissions.map((c) => {
+                                // Достаем красивый статус и цвет (если вдруг статус незнакомый, применяем дефолтный серый)
+                                const statusInfo = STATUS_UI[c.commissionProgress] || {
+                                    label: c.commissionProgress,
+                                    color: "bg-slate-100 text-slate-600 border-slate-200"
+                                };
+
+                                return (
+                                    <tr key={c.id} className="hover:bg-slate-50/50 transition-colors">
+                                        <td className="p-4 font-bold text-slate-900">
+                                            <Link to={`/commissions/${c.id}`} className="hover:text-blue-600 hover:underline">
+                                                {c.title}
+                                            </Link>
+                                        </td>
+                                        <td className="p-4">
+                                            {/* Применяем динамические классы */}
+                                            <span className={`px-2.5 py-1 rounded-md font-bold uppercase text-[9px] tracking-wider border ${statusInfo.color}`}>
+                                                    {statusInfo.label}
+                                                </span>
+                                        </td>
+                                        <td className="p-4 font-semibold text-slate-700">
+                                            {c.budgetMin} $
+                                        </td>
+                                        <td className="p-4 text-right">
+                                            <Link
+                                                to={`/commissions/${c.id}`}
+                                                className="inline-flex items-center gap-1 text-slate-900 font-bold hover:text-blue-600 transition-colors"
+                                            >
+                                                Управление <ArrowRight className="w-3 h-3" />
+                                            </Link>
+                                        </td>
+                                    </tr>
+                                );
+                            })
                         )}
                         </tbody>
                     </table>
                 </div>
+
+                <CreateCommissionModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                />
 
             </div>
         </div>

@@ -20,28 +20,66 @@ interface PublicUserProfile {
     portfolioLinks?: string[];
     companyName?: string;
     companyLink?: string;
+    profilePicture?: string; // Добавили поле аватарки
+}
+
+interface ReviewData {
+    id: string;
+    commissionId: string;
+    clientRating?: number | null;
+    clientReview?: string | null;
+    developerRating?: number | null;
+    developerReview?: string | null;
+    createdAt: string;
+    updatedAt: string;
+    commission?: {
+        title: string;
+    };
 }
 
 export async function loader({ params, request }: Route.LoaderArgs) {
     const cookieHeader = request.headers.get("Cookie");
+    const headers = cookieHeader ? { Cookie: cookieHeader } : undefined;
 
     try {
-        const response = await api.get(`/users/${params.id}`, {
-            headers: cookieHeader ? { Cookie: cookieHeader } : undefined
-        });
+        const [userRes, reviewsRes] = await Promise.all([
+            api.get(`/users/${params.id}`, { headers }),
+            api.get(`/reviews/user-id/${params.id}`, { headers })
+        ]);
 
-        return { user: response.data as PublicUserProfile };
+        return {
+            user: userRes.data as PublicUserProfile,
+            reviews: reviewsRes.data as ReviewData[]
+        };
     } catch (error: any) {
-        console.error(`[Public Profile Loader] Failed to fetch user ${params.id}:`, error.message);
+        console.error(`[Public Profile Loader] Failed to fetch data:`, error.message);
         throw new Response("Пользователь не найден", { status: 404 });
     }
 }
 
 export default function PublicProfilePage() {
-    const { user } = useLoaderData<typeof loader>();
+    const { user, reviews } = useLoaderData<typeof loader>();
 
     const firstLetter = user.displayedName ? user.displayedName.charAt(0).toUpperCase() : "U";
     const fullName = `${user.name} ${user.surname || ""}`.trim();
+
+    const displayReviews = reviews.filter((r) => {
+        if (user.role === "DEVELOPER") return r.clientRating != null;
+        if (user.role === "CLIENT") return r.developerRating != null;
+        return false;
+    }).map((r) => {
+        const rating = user.role === "DEVELOPER" ? r.clientRating : r.developerRating;
+        const text = user.role === "DEVELOPER" ? r.clientReview : r.developerReview;
+        const authorRole = user.role === "DEVELOPER" ? "Заказчик" : "Разработчик";
+        return {
+            id: r.id,
+            rating,
+            text,
+            authorRole,
+            date: new Date(r.updatedAt || r.createdAt).toLocaleDateString("ru-RU"),
+            commissionTitle: r.commission?.title || "Заказ"
+        };
+    });
 
     return (
         <div className="flex-1 bg-slate-50 min-h-screen py-10">
@@ -58,15 +96,29 @@ export default function PublicProfilePage() {
 
                     {/* Хедер профиля */}
                     <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6 mb-8 pb-6 border-b border-slate-100">
-                        <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center text-2xl font-black text-white shadow-inner shrink-0">
-                            {firstLetter}
-                        </div>
-                        <div className="flex-1">
-                            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{user.displayedName}</h1>
-                            <p className="text-xs text-slate-400 font-medium mt-0.5">{fullName} (@{user.login})</p>
+                        {/* 🔥 ФИЧА: Если есть аватарка — рендерим её, если нет — букву */}
+                        {user.profilePicture ? (
+                            <img
+                                src={user.profilePicture}
+                                alt={user.displayedName}
+                                className="w-20 h-20 rounded-full object-cover border border-slate-200 shadow-sm shrink-0"
+                                onError={(e) => {
+                                    // Fallback на случай битой ссылки
+                                    (e.target as HTMLElement).style.display = 'none';
+                                }}
+                            />
+                        ) : (
+                            <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center text-2xl font-black text-white shadow-inner shrink-0">
+                                {firstLetter}
+                            </div>
+                        )}
+
+                        <div className="flex-1 min-w-0">
+                            <h1 className="text-2xl font-bold text-slate-900 tracking-tight truncate">{user.displayedName}</h1>
+                            <p className="text-xs text-slate-400 font-medium mt-0.5 truncate">{fullName} (@{user.login})</p>
 
                             {user.profileStatus && (
-                                <p className="text-xs text-slate-600 mt-2 italic bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 inline-block">
+                                <p className="text-xs text-slate-600 mt-2 italic bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 inline-block max-w-full break-words">
                                     {user.profileStatus}
                                 </p>
                             )}
@@ -95,12 +147,11 @@ export default function PublicProfilePage() {
                     </div>
 
                     <div className="space-y-6">
-
                         {/* Блок "О себе" */}
                         {user.role === "DEVELOPER" && user.bio && (
                             <div>
                                 <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">О себе</h3>
-                                <p className="text-sm text-slate-600 leading-relaxed bg-slate-50/50 p-4 rounded-xl border border-slate-100">
+                                <p className="text-sm text-slate-600 leading-relaxed bg-slate-50/50 p-4 rounded-xl border border-slate-100 whitespace-pre-wrap">
                                     {user.bio}
                                 </p>
                             </div>
@@ -183,31 +234,42 @@ export default function PublicProfilePage() {
                             </div>
                         )}
 
-                        {/* Отзывы (Заглушка) */}
+                        {/* Настоящие отзывы с бэкенда */}
                         <div className="pt-8 border-t border-slate-100 mt-8">
                             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 mb-4">
-                                <Star className="w-4 h-4 text-amber-500 fill-amber-500" /> Отзывы (2)
+                                <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                                Отзывы ({displayReviews.length})
                             </h3>
-                            <div className="space-y-4">
-                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div className="font-bold text-xs text-slate-900">Крипто Инвест</div>
-                                        <div className="text-[10px] text-slate-400">12 мая 2026</div>
-                                    </div>
-                                    <p className="text-xs text-slate-600 leading-relaxed">
-                                        Сделал лендинг вовремя, правки внес без проблем. Рекомендую.
-                                    </p>
+
+                            {displayReviews.length === 0 ? (
+                                <div className="bg-slate-50 border border-slate-100 rounded-xl p-8 text-center text-slate-400 text-xs">
+                                    Пользователь пока не получил ни одного отзыва.
                                 </div>
-                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div className="font-bold text-xs text-slate-900">Иван Петров</div>
-                                        <div className="text-[10px] text-slate-400">01 апр 2026</div>
-                                    </div>
-                                    <p className="text-xs text-slate-600 leading-relaxed">
-                                        Всё супер! Качество кода отличное.
-                                    </p>
+                            ) : (
+                                <div className="space-y-4">
+                                    {displayReviews.map((r) => (
+                                        <div key={r.id} className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <div>
+                                                    <div className="font-bold text-xs text-slate-900">{r.commissionTitle}</div>
+                                                    <div className="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1">
+                                                        <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                                                        <span className="font-bold text-slate-700">{Number(r.rating).toFixed(1)}</span>
+                                                        <span className="mx-1">•</span>
+                                                        Отзыв от: {r.authorRole}
+                                                    </div>
+                                                </div>
+                                                <div className="text-[10px] text-slate-400">{r.date}</div>
+                                            </div>
+                                            {r.text && (
+                                                <p className="text-xs text-slate-600 leading-relaxed mt-3 bg-white p-3 rounded-lg border border-slate-100 whitespace-pre-wrap">
+                                                    {r.text}
+                                                </p>
+                                            )}
+                                        </div>
+                                    ))}
                                 </div>
-                            </div>
+                            )}
                         </div>
 
                     </div>
