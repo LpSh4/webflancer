@@ -151,6 +151,7 @@ export class BidRepository {
         commissionId: commissionId,
         bidStatus: Not(BidStatus.WITHDRAWN),
       },
+      relations: ['developer'],
     });
   }
 
@@ -159,7 +160,7 @@ export class BidRepository {
     if (!(await this.userRepo.findById(userId, manager)))
       throw new NotFoundError("User Not Found");
 
-    return manager.find(Bid, { where: { developerId: userId } });
+    return manager.find(Bid, { where: { developerId: userId }, relations: ['developer'], });
   }
 
   async findById(id: string, em?: EntityManager): Promise<Bid> {

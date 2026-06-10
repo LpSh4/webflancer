@@ -13,7 +13,7 @@ import { bidRoutes } from "./modules/bid/bid.route";
 import { proposalRoutes } from "./modules/proposal/proposal.route";
 import { reviewRoutes } from "./modules/review/review.route";
 import { notificationRoutes } from "./modules/notification/notification.route";
-// import ioPlugin from "./plugins/socket";
+import ioPlugin from "./plugins/socket";
 
 interface FastifyOptions {
   logger: any;
@@ -61,7 +61,7 @@ class Server {
     await this.fastify.register(corsPlugin);
     await this.fastify.register(diPlugin);
     await this.fastify.register(cookiePlugin);
-    // await this.fastify.register(ioPlugin);
+    await this.fastify.register(ioPlugin);
   }
 
   async registerRoutes() {
@@ -107,6 +107,20 @@ class Server {
     await this.initInfrastructure();
     await this.registerPlugins();
     await this.registerRoutes();
+
+    this.fastify.ready((err) => {
+      if (err) throw err;
+      if (this.fastify.io) {
+        // Достаем сервисы из Awilix
+        const wsService = (this.fastify as any).diContainer.cradle.wsService;
+        const jwtService = (this.fastify as any).diContainer.cradle.jwtService;
+
+        // Запускаем
+        wsService.init(this.fastify.io, jwtService);
+        this.fastify.log.info("WebSocket Server initialized!");
+      }
+    });
+
     await this.startHttpServer();
   }
 }

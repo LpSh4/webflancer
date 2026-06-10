@@ -251,7 +251,7 @@ export class CommissionRepository {
   async findById(id: string, em?: EntityManager): Promise<Commission> {
     const manager = em ?? this.em;
 
-    const commission = await manager.findOne(Commission, { where: { id: id } });
+    const commission = await manager.findOne(Commission, { where: { id: id }});
 
     if (!commission) throw new NotFoundError("Commission not found");
 

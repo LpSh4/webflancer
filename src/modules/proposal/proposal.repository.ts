@@ -1,151 +1,162 @@
-import { EntityManager, UpdateResult } from "typeorm";
-import { CommissionRepository } from "../commission/commission.repository";
-import { UserRepository } from "../user/user.repository";
+import {EntityManager, UpdateResult} from "typeorm";
+import {CommissionRepository} from "../commission/commission.repository";
+import {UserRepository} from "../user/user.repository";
 import {
-  NotFoundError,
-  RequestError,
-  UnauthorizedError,
+    NotFoundError,
+    RequestError,
+    UnauthorizedError,
 } from "../../errors/errors";
 import {
-  CommissionProgress,
-  CommissionWorkStatus,
-  ProposalStatus,
+    CommissionProgress,
+    CommissionWorkStatus,
+    ProposalStatus,
 } from "../../entities/commission.enums";
-import { CommissionProposal } from "../../entities/commission.entity.proposals";
+import {CommissionProposal} from "../../entities/commission.entity.proposals";
 
 export class ProposalRepository {
-  constructor(
-    private commissionRepo: CommissionRepository,
-    private userRepo: UserRepository,
-    private em: EntityManager,
-  ) {}
+    constructor(
+        private commissionRepo: CommissionRepository,
+        private userRepo: UserRepository,
+        private em: EntityManager,
+    ) {
+    }
 
-  async createProposal(
-    targetId: string,
-    userId: string,
-    workStatus: CommissionWorkStatus,
-    em?: EntityManager,
-  ): Promise<CommissionProposal> {
-    const manager = em ?? this.em;
+    async createProposal(
+        targetId: string,
+        userId: string,
+        workStatus: CommissionWorkStatus,
+        em?: EntityManager,
+    ): Promise<CommissionProposal> {
+        const manager = em ?? this.em;
 
-    const commission = await this.commissionRepo.findById(targetId, manager);
-    if (!commission) throw new NotFoundError("Commission not found");
-    if (!(await this.commissionRepo.checkAccessibility(targetId, manager)))
-      throw new RequestError("Not accessible for proposals");
+        const commission = await this.commissionRepo.findById(targetId, manager);
+        if (!commission) throw new NotFoundError("Commission not found");
+        if (!(await this.commissionRepo.checkAccessibility(targetId, manager)))
+            throw new RequestError("Not accessible for proposals");
 
-    const user = await this.userRepo.findById(userId);
-    if (!user) throw new RequestError("User not found");
-    if (userId !== commission.developerId) throw new UnauthorizedError();
+        const user = await this.userRepo.findById(userId);
+        if (!user) throw new RequestError("User not found");
+        if (userId !== commission.developerId) throw new UnauthorizedError();
 
-    const proposal = manager.create(CommissionProposal, {
-      status: ProposalStatus.PENDING,
-      proposedStatus: workStatus,
-      commissionId: targetId,
-    });
-    await this.commissionRepo.changeProgress(
-      targetId,
-      (
-        {
-          UI_UX_DESIGN: CommissionProgress.DEVELOPMENT,
-          DATABASE_ARCHITECTURE: CommissionProgress.DEVELOPMENT,
-          BACKEND_DEVELOPMENT: CommissionProgress.DEVELOPMENT,
-          FRONTEND_DEVELOPMENT: CommissionProgress.DEVELOPMENT,
-          DEVOPS_ESTABLISHMENT: CommissionProgress.TESTING,
-          FULLSTACK_INTEGRATION: CommissionProgress.TESTING,
-          PRODUCTION: CommissionProgress.DEVELOPMENT_COMPLETE,
-        } as unknown as Record<CommissionWorkStatus, CommissionProgress>
-      )[workStatus],
-      manager,
-    );
-    return manager.save(proposal);
-  }
+        const proposal = manager.create(CommissionProposal, {
+            status: ProposalStatus.PENDING,
+            proposedStatus: workStatus,
+            commissionId: targetId,
+        });
+        await this.commissionRepo.changeProgress(
+            targetId,
+            (
+                {
+                    UI_UX_DESIGN: CommissionProgress.DEVELOPMENT,
+                    DATABASE_ARCHITECTURE: CommissionProgress.DEVELOPMENT,
+                    BACKEND_DEVELOPMENT: CommissionProgress.DEVELOPMENT,
+                    FRONTEND_DEVELOPMENT: CommissionProgress.DEVELOPMENT,
+                    DEVOPS_ESTABLISHMENT: CommissionProgress.TESTING,
+                    FULLSTACK_INTEGRATION: CommissionProgress.TESTING,
+                    PRODUCTION: CommissionProgress.DEVELOPMENT_COMPLETE,
+                } as unknown as Record<CommissionWorkStatus, CommissionProgress>
+            )[workStatus],
+            manager,
+        );
+        return manager.save(proposal);
+    }
 
-  async changeStatus(
-    targetId: string,
-    userId: string,
-    status: ProposalStatus,
-    em?: EntityManager,
-  ): Promise<CommissionProposal> {
-    const manager = em ?? this.em;
-    const user = await this.userRepo.findById(userId);
-    if (!user) throw new RequestError("User not found");
-    const proposal = await this.findById(targetId, user.id, manager);
-    const commission = await this.commissionRepo.findById(
-      proposal.commissionId,
-    );
-    if (user.id !== commission.clientId) throw new UnauthorizedError();
+    async changeStatus(
+        targetId: string,
+        userId: string,
+        status: ProposalStatus,
+        em?: EntityManager,
+    ): Promise<CommissionProposal> {
+        const manager = em ?? this.em;
+        const user = await this.userRepo.findById(userId);
+        if (!user) throw new RequestError("User not found");
+        const proposal = await this.findById(targetId, user.id, manager);
+        const commission = await this.commissionRepo.findById(
+            proposal.commissionId,
+            manager, // <-- передай manager
+        );
+        if (user.id !== commission.clientId) throw new UnauthorizedError();
 
-    proposal.status = status;
+        proposal.status = status;
 
-    return manager.save(proposal);
-  }
+        // Если принято — обновляем статус работы в комиссии
+        if (status === ProposalStatus.ACCEPTED) {
+            await manager.update(
+                require("../../entities/commission.entity").Commission,
+                {id: commission.id},
+                {commissionWorkStatus: proposal.proposedStatus}
+            );
+        }
 
-  async acceptAll(
-    targetId: string,
-    userId: string,
-    em?: EntityManager,
-  ): Promise<UpdateResult> {
-    const manager = em ?? this.em;
+        return manager.save(proposal);
+    }
 
-    const commission = await this.commissionRepo.findById(targetId);
-    if (!commission) throw new NotFoundError("Commission not found");
-    if (commission.clientId !== userId) throw new UnauthorizedError();
+    async acceptAll(
+        targetId: string,
+        userId: string,
+        em?: EntityManager,
+    ): Promise<UpdateResult> {
+        const manager = em ?? this.em;
 
-    return manager.update(
-      CommissionProposal,
-      {
-        commissionId: targetId,
-        status: ProposalStatus.PENDING,
-      },
-      { status: ProposalStatus.ACCEPTED },
-    );
-  }
+        const commission = await this.commissionRepo.findById(targetId);
+        if (!commission) throw new NotFoundError("Commission not found");
+        if (commission.clientId !== userId) throw new UnauthorizedError();
 
-  async findById(
-    targetId: string,
-    userId?: string,
-    em?: EntityManager,
-  ): Promise<CommissionProposal> {
-    const manager = em ?? this.em;
+        return manager.update(
+            CommissionProposal,
+            {
+                commissionId: targetId,
+                status: ProposalStatus.PENDING,
+            },
+            {status: ProposalStatus.ACCEPTED},
+        );
+    }
 
-    const proposal = await manager.findOne(CommissionProposal, {
-      where: { id: targetId },
-    });
-    if (!proposal) throw new NotFoundError("Proposal not found");
+    async findById(
+        targetId: string,
+        userId?: string,
+        em?: EntityManager,
+    ): Promise<CommissionProposal> {
+        const manager = em ?? this.em;
 
-    const commission = await this.commissionRepo.findById(
-      proposal.commissionId,
-      manager,
-    );
-    if (!commission) throw new NotFoundError("Commission not found");
-    if (userId !== commission.clientId && userId !== commission.developerId)
-      throw new UnauthorizedError();
+        const proposal = await manager.findOne(CommissionProposal, {
+            where: {id: targetId},
+        });
+        if (!proposal) throw new NotFoundError("Proposal not found");
 
-    return proposal;
-  }
+        const commission = await this.commissionRepo.findById(
+            proposal.commissionId,
+            manager,
+        );
+        if (!commission) throw new NotFoundError("Commission not found");
+        if (userId !== commission.clientId && userId !== commission.developerId)
+            throw new UnauthorizedError();
 
-  async findByCommissionId(
-    targetId: string,
-    userId?: string,
-    em?: EntityManager,
-  ): Promise<CommissionProposal[]> {
-    const manager = em ?? this.em;
+        return proposal;
+    }
 
-    const commission = await this.commissionRepo.findById(targetId, manager);
-    if (!commission) throw new NotFoundError("Commission not found");
+    async findByCommissionId(
+        targetId: string,
+        userId?: string,
+        em?: EntityManager,
+    ): Promise<CommissionProposal[]> {
+        const manager = em ?? this.em;
 
-    console.log(
-      `${userId} = ${commission.clientId} = ${commission.developerId}`,
-    );
+        const commission = await this.commissionRepo.findById(targetId, manager);
+        if (!commission) throw new NotFoundError("Commission not found");
 
-    if (userId !== commission.clientId && userId !== commission.developerId)
-      throw new UnauthorizedError();
+        console.log(
+            `${userId} = ${commission.clientId} = ${commission.developerId}`,
+        );
 
-    return manager.find(CommissionProposal, {
-      where: { commissionId: targetId },
-      order: {
-        createdAt: "DESC",
-      },
-    });
-  }
+        if (userId !== commission.clientId && userId !== commission.developerId)
+            throw new UnauthorizedError();
+
+        return manager.find(CommissionProposal, {
+            where: {commissionId: targetId},
+            order: {
+                createdAt: "DESC",
+            },
+        });
+    }
 }
