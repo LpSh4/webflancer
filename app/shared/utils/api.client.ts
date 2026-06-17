@@ -1,18 +1,20 @@
 import axios from "axios";
 import type { AxiosInstance } from "axios";
 
-// export const apiClient: AxiosInstance = axios.create({
-//     baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1',
-//     withCredentials: true,
-//     headers: {
-//         "Content-Type": "application/json",
-//     },
-// });
+// Determine the base URL dynamically but accurately for local host development
+const getBaseURL = () => {
+    if (typeof window !== 'undefined') {
+        // Browser context
+        return import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
+    } else {
+        // Node Server (SSR) context
+        // If API_BASE_URL isn't set in your terminal shell or .env, force it to localhost:3000 instead of docker 'server:3000'
+        return process.env.API_BASE_URL || 'http://127.0.0.1:3000/api/v1';
+    }
+};
+
 export const apiClient: AxiosInstance = axios.create({
-    baseURL: typeof window !== 'undefined'
-        ? (import.meta.env.VITE_API_BASE_URL || 'https://backend.ryban.ru/api/v1') // Для браузера
-        : (process.env.API_BASE_URL || 'http://server:3000/api/v1'), // Для SSR (внутри сети докера)
-    // baseURL: import.meta.env.VITE_API_BASE_URL
+    baseURL: getBaseURL(),
     withCredentials: true,
     headers: {
         "Content-Type": "application/json",

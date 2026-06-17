@@ -1,4 +1,4 @@
-import { useLoaderData, useActionData, useSearchParams, Form, useNavigate } from "react-router";
+import { useLoaderData, useSearchParams, useFetcher } from "react-router"; // 🔥 Заменили useActionData на useFetcher
 import type { Route } from "./+types/feed";
 import { useState, useEffect } from "react";
 import { getUser } from "~/shared/utils/auth.server";
@@ -41,18 +41,16 @@ export async function loader({ request }: Route.LoaderArgs) {
 
     try {
         if (user.role === "CLIENT") {
-            // Для клиента грузим только его заказы (без пагинации)
             const response = await api.get(`/commissions/user/${user.id}`, {
                 headers: { Cookie: cookieHeader }
             });
             commissions = response.data;
         } else {
-            // 🔥 Для разработчика используем мощный бэкенд-поиск с пагинацией!
             const response = await api.get(`/commissions/search?${searchParams}`, {
                 headers: { Cookie: cookieHeader }
             });
             commissions = response.data.data || [];
-            meta = response.data.meta || null; // Достаем мету (страницы, тотал)
+            meta = response.data.meta || null;
         }
     } catch (error) {
         console.error("[Feed Loader] Ошибка загрузки заказов:", error);
@@ -63,8 +61,16 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export async function action({ request }: Route.ActionArgs) {
     const formData = await request.formData();
-    const data = Object.fromEntries(formData);
+    let data = Object.fromEntries(formData);
     const cookieHeader = request.headers.get("Cookie");
+
+    // 🔥 Автоматическая подстановка протокола на бэкенде
+    if (data.designLink && typeof data.designLink === "string") {
+        let link = data.designLink.trim();
+        if (link && !/^https?:\/\//i.test(link)) {
+            data.designLink = `https://${link}`;
+        }
+    }
 
     const result = createCommissionSchema.safeParse(data);
 
@@ -104,18 +110,32 @@ export async function action({ request }: Route.ActionArgs) {
 
 export default function CommissionsPage() {
     const { user, commissions: initialCommissions, meta } = useLoaderData<typeof loader>();
-    const actionData = useActionData<typeof action>();
+
+    // 🔥 Переводим на изолированный fetcher вместо мутации глобального экшена страницы
+    const fetcher = useFetcher<typeof action>();
+    const actionData = fetcher.data;
+
     const [searchParams, setSearchParams] = useSearchParams();
-    const navigate = useNavigate();
-
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showSuccessBanner, setShowSuccessBanner] = useState(false);
 
-    // Закрываем модалку при успешном создании заказа
+    const handleOpenModal = () => {
+        if (fetcher.data) {
+            fetcher.data = undefined;
+        }
+        setIsModalOpen(true);
+    };
+
+    // Контроль закрытия и всплывающего баннера
     useEffect(() => {
-        if (actionData?.success) setIsModalOpen(false);
+        if (actionData?.success) {
+            setIsModalOpen(false);
+            setShowSuccessBanner(true);
+            const timer = setTimeout(() => setShowSuccessBanner(false), 6000);
+            return () => clearTimeout(timer);
+        }
     }, [actionData]);
 
-    // Локальная фильтрация ТОЛЬКО для клиента (разрабу фильтрует бэкенд)
     const filteredCommissions = initialCommissions.filter(item => {
         if (user.role === "CLIENT") {
             const keywords = searchParams.get("keywords")?.toLowerCase() || "";
@@ -128,7 +148,6 @@ export default function CommissionsPage() {
         return true;
     });
 
-    // Обработчик пагинации
     const handlePageChange = (newPage: number) => {
         const newParams = new URLSearchParams(searchParams);
         newParams.set("page", newPage.toString());
@@ -154,16 +173,20 @@ export default function CommissionsPage() {
                     </div>
 
                     {user.role === "CLIENT" && (
-                        <Button onClick={() => setIsModalOpen(true)} className="gap-2">
+                        <Button onClick={handleOpenModal} className="gap-2 rounded-xl shadow-sm">
                             <PlusCircle className="w-4 h-4" /> Создать заказ
                         </Button>
                     )}
                 </div>
 
                 {/* Уведомление об успехе */}
-                {actionData?.success && (
-                    <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-sm font-medium flex items-center gap-2 mb-6">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-600" /> Заказ успешно опубликован!
+                {showSuccessBanner && (
+                    <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-sm font-medium flex items-center justify-between mb-6 shadow-sm transition-all animate-fade-in">
+                        <div className="flex items-center gap-2">
+                            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                            <span>Заказ успешно опубликован!</span>
+                        </div>
+                        <button onClick={() => setShowSuccessBanner(false)} className="text-emerald-400 hover:text-emerald-600 font-bold px-2">✕</button>
                     </div>
                 )}
 
@@ -187,7 +210,7 @@ export default function CommissionsPage() {
                     </div>
                 )}
 
-                {/* ПАГИНАЦИЯ (только для разработчиков, если страниц больше 1) */}
+                {/* ПАГИНАЦИЯ */}
                 {user.role === "DEVELOPER" && meta && meta.lastPage > 1 && (
                     <div className="mt-10 flex items-center justify-center gap-2">
                         <Button
@@ -214,9 +237,11 @@ export default function CommissionsPage() {
                     </div>
                 )}
 
+                {/* 🔥 Теперь пропс fetcher передан корректно и падений не будет! */}
                 <CreateCommissionModal
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
+                    fetcher={fetcher}
                 />
             </div>
         </div>

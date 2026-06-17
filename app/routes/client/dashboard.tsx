@@ -1,4 +1,4 @@
-import { useLoaderData, useActionData, Link } from "react-router";
+import { useLoaderData, Link, useFetcher } from "react-router";
 import { useState, useEffect } from "react";
 import type { Route } from "./+types/dashboard";
 import { getUser } from "~/shared/utils/auth.server";
@@ -6,8 +6,9 @@ import { api } from "~/shared/utils/api.server";
 import { FolderKanban, CheckCircle2, LayoutGrid, ArrowRight, PlusCircle } from "lucide-react";
 import { Button } from "~/shared/ui/Button";
 import { CreateCommissionModal } from "~/features/commission/ui/CreateCommissionModal";
-import { createCommissionSchema } from "~/features/commission/commission.schema";
+import { createCommissionSchema } from "~/features/commission/commission.schema"; // 🔥 Вернули импорт схемы
 import { COMMISSION_PROGRESS_LABELS } from "~/features/commission/commission.constants";
+
 interface Commission {
     id: string;
     title: string;
@@ -17,7 +18,6 @@ interface Commission {
     createdAt: string;
 }
 
-// 🔥 Красивый маппинг статусов на русский язык с цветами
 const getStatusStyles = (status: string) => {
     switch (status) {
         case "POSTED":
@@ -111,11 +111,21 @@ export async function action({ request }: Route.ActionArgs) {
     }
 }
 
+// 🔥 Убрали дубликаты заглушек loader и action, которые ломали билд
+
 export default function ClientDashboard() {
     const { user, commissions, stats } = useLoaderData<typeof loader>();
-    const actionData = useActionData<typeof action>();
+    const fetcher = useFetcher<typeof action>();
+    const actionData = fetcher.data;
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleOpenModal = () => {
+        if (fetcher.data) {
+            fetcher.data = undefined;
+        }
+        setIsModalOpen(true);
+    };
 
     useEffect(() => {
         if (actionData?.success) {
@@ -126,14 +136,12 @@ export default function ClientDashboard() {
     return (
         <div className="p-6 bg-slate-50 min-h-screen">
             <div className="max-w-5xl mx-auto">
-
                 <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900">Панель управления заказами</h1>
-                        <p className="text-xs text-slate-500 mt-1">Добро пожаловать, <span
-                            className="font-semibold text-slate-700">{user.displayedName}</span></p>
+                        <p className="text-xs text-slate-500 mt-1">Добро пожаловать, <span className="font-semibold text-slate-700">{user.displayedName}</span></p>
                     </div>
-                    <Button onClick={() => setIsModalOpen(true)} className="gap-2 shadow-sm">
+                    <Button onClick={handleOpenModal} className="gap-2 shadow-sm">
                         <PlusCircle className="w-4 h-4" /> Создать заказ
                     </Button>
                 </div>
@@ -144,6 +152,7 @@ export default function ClientDashboard() {
                     </div>
                 )}
 
+                {/* Блоки статистики */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
                         <div className="p-3 bg-slate-100 text-slate-700 rounded-lg">
@@ -176,6 +185,7 @@ export default function ClientDashboard() {
                     </div>
                 </div>
 
+                {/* Таблица проектов */}
                 <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
                     <table className="w-full text-xs text-left">
                         <thead className="bg-slate-50 border-b border-slate-200">
@@ -189,35 +199,23 @@ export default function ClientDashboard() {
                         <tbody className="divide-y divide-slate-100">
                         {commissions.length === 0 ? (
                             <tr>
-                                <td colSpan={4} className="p-8 text-center text-slate-400 italic">
-                                    У вас еще нет созданных проектов.
-                                </td>
+                                <td colSpan={4} className="p-8 text-center text-slate-400 italic">У вас еще нет созданных проектов.</td>
                             </tr>
                         ) : (
                             commissions.map((c) => {
                                 const statusLabel = COMMISSION_PROGRESS_LABELS[c.commissionProgress] || c.commissionProgress;
                                 const statusColor = getStatusStyles(c.commissionProgress);
-
                                 return (
                                     <tr key={c.id} className="hover:bg-slate-50/50 transition-colors">
                                         <td className="p-4 font-bold text-slate-900">
-                                            <Link to={`/commissions/${c.id}`} className="hover:text-blue-600 hover:underline">
-                                                {c.title}
-                                            </Link>
+                                            <Link to={`/commissions/${c.id}`} className="hover:text-blue-600 hover:underline">{c.title}</Link>
                                         </td>
                                         <td className="p-4">
-                                             <span className={`px-2.5 py-1 rounded-md font-bold uppercase text-[9px] tracking-wider border ${statusColor}`}>
-                                                 {statusLabel}
-                                             </span>
+                                            <span className={`px-2.5 py-1 rounded-md font-bold uppercase text-[9px] tracking-wider border ${statusColor}`}>{statusLabel}</span>
                                         </td>
-                                        <td className="p-4 font-semibold text-slate-700">
-                                            {c.budgetMin} $
-                                        </td>
+                                        <td className="p-4 font-semibold text-slate-700">{c.budgetMin} $</td>
                                         <td className="p-4 text-right">
-                                            <Link
-                                                to={`/commissions/${c.id}`}
-                                                className="inline-flex items-center gap-1 text-slate-900 font-bold hover:text-blue-600 transition-colors"
-                                            >
+                                            <Link to={`/commissions/${c.id}`} className="inline-flex items-center gap-1 text-slate-900 font-bold hover:text-blue-600 transition-colors">
                                                 Управление <ArrowRight className="w-3 h-3" />
                                             </Link>
                                         </td>
@@ -232,8 +230,8 @@ export default function ClientDashboard() {
                 <CreateCommissionModal
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
+                    fetcher={fetcher}
                 />
-
             </div>
         </div>
     );

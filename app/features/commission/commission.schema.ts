@@ -1,37 +1,38 @@
 import { z } from "zod";
 
 export const createCommissionSchema = z.object({
+    type: z.string().min(1, "Выберите категорию проекта"),
     title: z.string()
-        .min(5, "Название проекта должно быть не менее 5 символов")
-        .max(255, "Слишком длинное название"),
-    type: z.string().min(1, "Выберите категорию"),
-    budgetMin: z.preprocess(
-        (val) => (val === "" || val == null ? undefined : Number(val)),
-        z.number({ message: "Укажите минимальный бюджет" })
-            .min(1, "Минимальный бюджет должен быть больше 0")
-            .max(99999999, "Бюджет превышает лимиты системы")
-    ),
-    budgetMax: z.preprocess(
-        (val) => (val === "" || val == null ? undefined : Number(val)),
-        z.number({ message: "Укажите корректное число" })
-            .min(1, "Максимальный бюджет должен быть больше 0")
-            .max(99999999, "Бюджет превышает лимиты системы")
-            .optional()
-    ),
-    designLink: z.string()
-        .trim()
-        .transform((val) => (val === "" ? undefined : val))
-        .pipe(z.string().url("Введите корректную ссылку (https://...)").optional()),
-    deadLine: z.string()
-        .transform((val) => (val === "" ? undefined : val))
-        .optional(),
+        .min(5, "Название должно быть не короче 5 символов")
+        .max(100, "Название не должно превышать 100 символов"),
     description: z.string()
-        .min(10, "Техническое задание должно содержать минимум 10 символов"),
-    functionality: z.string().optional(),
+        .min(20, "Опишите проект подробнее (минимум 20 символов)")
+        .max(2000, "ТЗ слишком длинное (максимум 2000 символов)"),
+    functionality: z.string().max(1000, "Максимум 1000 символов").optional(),
+    designLink: z.string().trim().optional(), // Нормализацию сделаем в компоненте
+    budgetMin: z.coerce.number()
+        .min(10, "Минимальный бюджет — 10$")
+        .max(1000000, "Слишком большой бюджет"),
+    budgetMax: z.coerce.number()
+        .max(1000000, "Слишком большой бюджет")
+        .optional()
+        .nullable(),
+    deadLine: z.string()
+        .optional()
+        .nullable()
+        .refine((val) => {
+            if (!val) return true;
+            const date = new Date(val);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return date >= today;
+        }, { message: "Дедлайн не может быть в прошлом" }),
 }).refine((data) => {
-    return !(data.budgetMax && data.budgetMin > data.budgetMax);
-
+    if (data.budgetMax && data.budgetMin > data.budgetMax) {
+        return false;
+    }
+    return true;
 }, {
     message: "Максимальный бюджет не может быть меньше минимального",
-    path: ["budgetMax"],
+    path: ["budgetMax"], // Ошибка привяжется к полю budgetMax
 });

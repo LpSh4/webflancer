@@ -1,7 +1,7 @@
 import { useParams, Link, useLoaderData, Form, useNavigation, useActionData } from "react-router";
 import type { Route } from "./+types/chat";
 import { useRef, useEffect, useState } from "react";
-import { Paperclip, Send, CheckCircle2, AlertCircle, ArrowLeft, Loader2, Flag, User as UserIcon } from "lucide-react";
+import { Paperclip, Send, CheckCircle2, AlertCircle, ArrowLeft, Loader2, Flag, User as UserIcon, LucideCheckCircle2 } from "lucide-react";
 import { Button } from "~/shared/ui/Button";
 import { getUser } from "~/shared/utils/auth.server";
 import { api } from "~/shared/utils/api.server";
@@ -64,7 +64,6 @@ export async function action({ request, params }: Route.ActionArgs) {
             return { success: true, message: "Этап отправлен на доработку" };
         }
         if (intent === "complete_commission") {
-            // 🔥 Вызываем метод завершения заказа (убедись, что роут на бэке именно такой, или поправь под свой)
             await api.post(`/commissions/complete/${params.orderId}`, {}, { headers });
             return { success: true, message: "Проект успешно завершен! Теперь можно оставить отзыв." };
         }
@@ -95,12 +94,14 @@ export default function ChatPage() {
     const isFinished = currentStage.percent === 100;
     const isOfficiallyCompleted = commission.commissionProgress === "COMPLETED";
 
+    // Условие досрочного закрытия (начиная со сбора требований/дизайна и далее)
+    const canForceComplete = isFinished || currentStage.percent >= 30;
+
     const activeProposal = Array.isArray(proposals) ? proposals.find((p: any) => p.status === "PENDING") : null;
     const proposedStageName = activeProposal
         ? WORK_STAGES.find(s => s.value === activeProposal.proposedStatus)?.label
         : "";
 
-    // Определяем имя собеседника
     const partnerName = user.role === "CLIENT"
         ? (commission.developer?.displayedName || `Исполнитель`)
         : (commission.client?.displayedName || `Заказчик`);
@@ -113,9 +114,6 @@ export default function ChatPage() {
 
         socket.on("connect", () => setIsSocketConnected(true));
         socket.on("disconnect", () => setIsSocketConnected(false));
-
-        socket.off("workspace_history");
-        socket.off("new_message");
 
         socket.emit("join_workspace", { orderId });
 
@@ -229,59 +227,63 @@ export default function ChatPage() {
             );
         }
 
-        // 🔥 КНОПКА ФИНАЛЬНОГО ЗАВЕРШЕНИЯ ПРОЕКТА ДЛЯ ЗАКАЗЧИКА 🔥
-        if ((isFinished || currentStage.percent >=30) && !activeProposal) {
-            return (
-                <div className="text-center py-5 bg-blue-50 border border-blue-100 rounded-xl">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
-                        <CheckCircle2 className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <p className="text-xs font-bold text-blue-800 mb-3"> {isFinished ? "Все этапы пройдены!" : "Пропустить выполнение этапов:"}</p>
-                    <Form method="post" className="px-3">
-                        <input type="hidden" name="intent" value="complete_commission" />
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="w-full py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors"
-                        >
-                            {isSubmitting ? "Завершение..." : "Завершить проект"}
-                        </button>
-                    </Form>
-                </div>
-            );
-        }
-
-        if (activeProposal) {
-            return (
-                <div className="space-y-3">
-                    <div className="bg-white p-3 rounded-lg border border-slate-200 text-center shadow-sm">
-                        <p className="text-[10px] text-slate-500 mb-1">Разработчик хочет перейти на этап:</p>
-                        <p className="text-xs font-bold text-blue-600">«{proposedStageName}»</p>
-                    </div>
-                    <Form method="post">
-                        <input type="hidden" name="intent" value="accept_stage" />
-                        <input type="hidden" name="proposalId" value={activeProposal.id} />
-                        <button type="submit" disabled={isSubmitting} className="w-full flex justify-center items-center gap-2 p-2.5 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors border border-emerald-200">
-                            <CheckCircle2 className="w-4 h-4" /> Принять
-                        </button>
-                    </Form>
-                    <Form method="post">
-                        <input type="hidden" name="intent" value="reject_stage" />
-                        <input type="hidden" name="proposalId" value={activeProposal.id} />
-                        <button type="submit" disabled={isSubmitting} className="w-full flex justify-center items-center gap-2 p-2.5 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors border border-amber-200">
-                            <AlertCircle className="w-4 h-4" /> На доработку
-                        </button>
-                    </Form>
-                </div>
-            );
-        }
-
         return (
-            <div className="text-center py-4 bg-white border border-slate-100 rounded-xl">
-                <p className="text-[10px] text-slate-400 leading-relaxed px-3">
-                    Исполнитель работает над этапом<br />
-                    <strong className="text-slate-600">«{currentStage.label}»</strong>
-                </p>
+            <div className="space-y-4">
+                {/* 1. Блок обработки текущего предложения разработчика */}
+                {activeProposal ? (
+                    <div className="space-y-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <div className="bg-white p-3 rounded-lg border border-slate-200 text-center shadow-sm">
+                            <p className="text-[10px] text-slate-500 mb-1">Разработчик хочет перейти на этап:</p>
+                            <p className="text-xs font-bold text-blue-600">«{proposedStageName}»</p>
+                        </div>
+                        <Form method="post">
+                            <input type="hidden" name="intent" value="accept_stage" />
+                            <input type="hidden" name="proposalId" value={activeProposal.id} />
+                            <button type="submit" disabled={isSubmitting} className="w-full flex justify-center items-center gap-2 p-2.5 text-xs font-bold text-emerald-700 bg-white hover:bg-emerald-50 rounded-lg transition-colors border border-emerald-200 shadow-sm">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Принять этап
+                            </button>
+                        </Form>
+                        <Form method="post">
+                            <input type="hidden" name="intent" value="reject_stage" />
+                            <input type="hidden" name="proposalId" value={activeProposal.id} />
+                            <button type="submit" disabled={isSubmitting} className="w-full flex justify-center items-center gap-2 p-2.5 text-xs font-bold text-amber-700 bg-white hover:bg-amber-50 rounded-lg transition-colors border border-amber-200 shadow-sm">
+                                <AlertCircle className="w-4 h-4 text-amber-500" /> На доработку
+                            </button>
+                        </Form>
+                    </div>
+                ) : (
+                    <div className="text-center py-4 bg-slate-50 border border-slate-200 rounded-xl">
+                        <p className="text-[10px] text-slate-400 leading-relaxed px-3">
+                            Исполнитель работает над этапом<br />
+                            <strong className="text-slate-600">«{currentStage.label}»</strong>
+                        </p>
+                    </div>
+                )}
+
+                {/* 2. Блок досрочного или финального закрытия проекта */}
+                {canForceComplete && (
+                    <div className="text-center py-5 bg-blue-50 border border-blue-100 rounded-xl shadow-sm">
+                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-2">
+                            <LucideCheckCircle2 className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <p className="text-xs font-bold text-blue-800 mb-2">
+                            {isFinished ? "Все этапы пройдены!" : "Досрочное завершение:"}
+                        </p>
+                        <p className="text-[9px] text-blue-600 px-3 mb-3 leading-normal">
+                            {!isFinished && "Вы можете закрыть проект прямо сейчас. Оставшиеся этапы будут пропущены."}
+                        </p>
+                        <Form method="post" className="px-3">
+                            <input type="hidden" name="intent" value="complete_commission" />
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="w-full py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50"
+                            >
+                                {isSubmitting ? "Завершение..." : "Завершить проект"}
+                            </button>
+                        </Form>
+                    </div>
+                )}
             </div>
         );
     };
@@ -308,7 +310,6 @@ export default function ChatPage() {
 
                     {/* ЛЕВАЯ ЧАСТЬ: ЧАТ */}
                     <div className="flex-1 flex flex-col min-w-0 min-h-0">
-                        {/* Заголовок чата (Теперь видно собеседника!) */}
                         <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 shrink-0">
                             <div>
                                 <h2 className="text-sm font-bold text-slate-900 truncate">{commission.title}</h2>
@@ -395,7 +396,6 @@ export default function ChatPage() {
 
                     {/* ПРАВАЯ ЧАСТЬ: САЙДБАР */}
                     <div className="w-72 border-l border-slate-100 bg-white flex flex-col shrink-0 overflow-y-auto">
-
                         {/* Прогресс */}
                         <div className="p-5 border-b border-slate-100">
                             <div className="flex justify-between items-center mb-3">
