@@ -28,10 +28,8 @@ export const createCommissionSchema = z.object({
             return date >= today;
         }, { message: "Дедлайн не может быть в прошлом" }),
 }).refine((data) => {
-    if (data.budgetMax && data.budgetMin > data.budgetMax) {
-        return false;
-    }
-    return true;
+    return !(data.budgetMax && data.budgetMin > data.budgetMax);
+
 }, {
     message: "Максимальный бюджет не может быть меньше минимального",
     path: ["budgetMax"], // Ошибка привяжется к полю budgetMax
